@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 import httpx
@@ -15,6 +16,8 @@ from .db import repository
 from .logging_config import configure_logging
 from .schemas import ChatRequest, ChatResponse
 from .service import handle_chat
+
+logger = logging.getLogger(__name__)
 
 configure_logging(settings.log_level)
 
@@ -105,7 +108,8 @@ async def ws_chat(ws: WebSocket, key: str = ""):
                 await ws.send_json(res.model_dump())
             except WebSocketDisconnect:
                 raise
-            except Exception:
+            except Exception as e:  # noqa: BLE001
+                logger.error("Lỗi WebSocket: %s", e)
                 await ws.send_json({"error": "Không thể xử lý yêu cầu."})
     except WebSocketDisconnect:
         pass

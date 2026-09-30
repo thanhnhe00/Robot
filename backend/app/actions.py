@@ -1,7 +1,7 @@
 """Kiểm tra JSON do model trả về. Model chỉ ĐỀ XUẤT, backend mới quyết định hợp lệ."""
 import json
 import re
-from typing import Any, Optional
+from typing import Any
 
 from .schemas import Action, ChatResponse
 
@@ -19,7 +19,7 @@ TIME_RE = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
 THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL)
 
 
-def _validate_params(action_type: str, params: dict[str, Any]) -> Optional[dict[str, Any]]:
+def _validate_params(action_type: str, params: dict[str, Any]) -> dict[str, Any] | None:
     """Trả về params đã làm sạch, hoặc None nếu không hợp lệ."""
     if action_type in ("get_time", "get_battery"):
         return {}
@@ -38,7 +38,7 @@ def _validate_params(action_type: str, params: dict[str, Any]) -> Optional[dict[
     return None  # action lạ -> bỏ
 
 
-def validate_action(raw: Any) -> Optional[Action]:
+def validate_action(raw: Any) -> Action | None:
     if not isinstance(raw, dict):
         return None
     action_type = str(raw.get("type", "")).strip()
@@ -62,7 +62,7 @@ def parse_model_output(text: str) -> ChatResponse:
     except json.JSONDecodeError as e:
         raise ValueError(f"JSON không hợp lệ: {e}") from e
     if not isinstance(data, dict):
-        raise ValueError("JSON gốc phải là object")
+        raise TypeError("JSON gốc phải là object")
     return ChatResponse(
         response=str(data.get("response", "")).strip(),
         action=validate_action(data.get("action")),
