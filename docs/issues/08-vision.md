@@ -13,7 +13,7 @@ Robot cần "nhìn"; vision và language model có trách nhiệm riêng.
 Phase 3 (Phase 6 cho tích hợp)
 
 ## Việc cần làm
-- [ ] Pipeline camera trên G8
+- [ ] Pipeline camera trên Samsung Galaxy Z Flip5
 - [ ] Object detection: chọn model sau khi kiểm tra license và tốc độ
 - [ ] Face detection + recognition + identity store
 - [ ] Quyền riêng tư: dữ liệu khuôn mặt chỉ lưu local, có xóa/quản lý

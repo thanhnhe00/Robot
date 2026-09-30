@@ -12,7 +12,7 @@ Trạng thái: **bản nháp kiến trúc; Phase 0 đang hoàn thiện**. Mọi 
 ## Sơ đồ
 
 ```
- ┌──────────────────────── ANDROID BRAIN (LG G8) ─────────────────────────┐
+ ┌──────── ANDROID BRAIN (Samsung Galaxy Z Flip5, 8GB/512GB) ─────────────┐
  │ UI + State machine: IDLE → WAKE → LISTENING → PROCESSING → SPEAKING    │
  │ Audio: Wake word → VAD → STT                    TTS → Speaker          │
  │ AGENT: Personality (yaml) + Memory + Tool selection                    │
@@ -58,4 +58,4 @@ Hiện tại (Phase 1 baseline) luật nằm trong `backend/app/actions.py`.
 | Android: Kotlin hay Flutter | Nghiêng Kotlin, **chưa chốt** |
 | Phone ↔ ESP32 | Nghiêng USB, **chưa chốt** |
 
-Kết quả nghiên cứu và giới hạn bằng chứng hiện có được ghi trong `docs/research/`. Tài liệu nền tảng không xác nhận hiệu năng trên LG G8. Đặc biệt, tăng tốc GPU/DSP, phiên bản Android/RAM thực tế, voice tiếng Việt có sẵn và khả năng vừa sạc vừa dùng USB host phải được đo hoặc kiểm tra trên thiết bị trước khi chốt.
+Kết quả nghiên cứu và giới hạn bằng chứng hiện có được ghi trong `docs/research/`. Thiết bị mục tiêu là Samsung Galaxy Z Flip5 với Snapdragon 8 Gen 2 for Galaxy, RAM 8GB và bộ nhớ 512GB. Hiệu năng LLM/voice, phiên bản Android/API thực tế, khả năng tăng tốc từng runtime và khả năng vừa sạc vừa dùng USB host vẫn phải kiểm tra trên chính máy.

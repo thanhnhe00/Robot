@@ -1,14 +1,14 @@
 # Research C — Android và liên kết phần cứng
 
-Ngày tra cứu: 2026-09-30. Tài liệu Android xác nhận hành vi API/OS; không xác nhận cấu hình phần cứng và chính sách firmware của chiếc LG G8 đang dùng.
+Ngày tra cứu: 2026-09-30. Thiết bị mục tiêu do chủ dự án chỉ định là Samsung Galaxy Z Flip5, Snapdragon 8 Gen 2 for Galaxy, RAM 8GB, bộ nhớ trong 512GB. Tài liệu Android xác nhận hành vi API/OS; phiên bản Android/API, SKU firmware và chính sách OEM của máy cần được ghi nhận trực tiếp.
 
 ## R8 — Khả năng và giới hạn Android
 
 | Use case | Điều tài liệu xác nhận | Yêu cầu/fallback |
 |---|---|---|
-| Microphone nền | Android yêu cầu khai báo foreground service type `microphone` và quyền phù hợp trên các phiên bản mục tiêu mới. `RECORD_AUDIO` chịu while-in-use restriction; không khởi tạo microphone FGS tùy ý khi app ở nền/boot. | Khởi động khi app đang hiển thị, xin quyền, thông báo FGS; thử pin/OEM behavior trên G8. Không hứa “Hey Robot” luôn hoạt động sau reboot. |
-| Báo thức | Android cung cấp `AlarmClock` intents để yêu cầu hệ thống đặt báo thức. | Mở/ủy quyền qua giao diện ứng dụng đồng hồ; kiểm tra app đích và hành vi trên G8. |
-| Âm lượng | Android cung cấp `AudioManager` để đọc/điều khiển stream theo quyền API. | Chọn đúng stream và kiểm tra hành vi/permission trên G8; có fallback bằng UI/volume controls. |
+| Microphone nền | Android yêu cầu khai báo foreground service type `microphone` và quyền phù hợp trên các phiên bản mục tiêu mới. `RECORD_AUDIO` chịu while-in-use restriction; không khởi tạo microphone FGS tùy ý khi app ở nền/boot. | Khởi động khi app đang hiển thị, xin quyền, thông báo FGS; thử pin/OEM behavior trên Z Flip5. Không hứa “Hey Robot” luôn hoạt động sau reboot. |
+| Báo thức | Android cung cấp `AlarmClock` intents để yêu cầu hệ thống đặt báo thức. | Mở/ủy quyền qua giao diện ứng dụng đồng hồ; kiểm tra app đích và hành vi trên Z Flip5. |
+| Âm lượng | Android cung cấp `AudioManager` để đọc/điều khiển stream theo quyền API. | Chọn đúng stream và kiểm tra hành vi/permission trên Z Flip5; có fallback bằng UI/volume controls. |
 | Wi‑Fi | Android 10+ hạn chế app thông thường bật/tắt Wi‑Fi trực tiếp. | Mở Settings panel hoặc để người dùng thao tác; không hứa bật/tắt trực tiếp. |
 | Mở ứng dụng | Android cho phép khởi chạy activity qua intent khi app đích có thể được resolve. | Dùng package allowlist đã thống nhất, xử lý app không cài/không có activity; kiểm tra visibility rules theo target SDK. |
 
@@ -21,7 +21,7 @@ Nguồn: [Foreground service types](https://developer.android.com/develop/backgr
 ## R9 — Kết nối điện thoại ↔ ESP32
 
 - Android USB Host API cho phép app giao tiếp với thiết bị USB khi phần cứng hỗ trợ; quyền truy cập thiết bị có luồng cấp quyền của Android.
-- Tài liệu Android không xác nhận LG G8 vừa làm USB host/OTG vừa sạc ổn định. Đây là kiểm tra phần cứng bắt buộc trước khi chọn USB.
+- Tài liệu Android không xác nhận Galaxy Z Flip5 vừa làm USB host/OTG vừa sạc ổn định. Đây là kiểm tra phần cứng bắt buộc trước khi chọn USB.
 - BLE/Wi‑Fi là các phương án cần so sánh ở Phase 9; chưa có số đo latency, độ tin cậy, pin hoặc nhiễu trong repo để xếp hạng.
 - Trước khi quyết định: ghi model/SKU, Android/API level, kiểm tra USB host, nguồn cấp/charge-through và kết nối serial thực tế; thử BLE/Wi‑Fi trong cùng điều kiện. Giữ watchdog firmware và e-stop độc lập với đường truyền.
 
@@ -29,4 +29,4 @@ Nguồn: [USB Host overview](https://developer.android.com/develop/connectivity/
 
 ## Những thông tin thiết bị còn thiếu
 
-Xác minh trên G8: model/SKU chính xác, Android/API level, RAM khả dụng, engine TTS/STT và gói tiếng Việt, quyền chạy microphone, chính sách tiết kiệm pin, USB host, sạc đồng thời và độ ổn định cáp. Các giá trị ghi trong handoff nhưng chưa đo phải tiếp tục mang nhãn `ASSUMPTION`.
+Xác minh trực tiếp trên Galaxy Z Flip5: model/SKU chính xác, Android/API level, RAM khả dụng (khác RAM vật lý 8GB), engine TTS/STT và gói tiếng Việt, quyền chạy microphone, chính sách tiết kiệm pin, USB host, sạc đồng thời và độ ổn định cáp. Các giá trị chưa đo phải tiếp tục mang nhãn `ASSUMPTION`.

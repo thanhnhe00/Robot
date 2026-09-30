@@ -1,9 +1,9 @@
-# ADR-0002: Spike LLM trên G8 trước Voice
+# ADR-0002: Spike LLM trên Galaxy Z Flip5 trước Voice
 Date: 2026-09-29
 Status: Accepted
 
 Decision:
-Chạy và benchmark LLM trên G8 (Phase 4) trước khi làm Voice (Phase 5).
+Chạy và benchmark LLM trên Samsung Galaxy Z Flip5 (Phase 4) trước khi làm Voice (Phase 5).
 
 Why:
 Model và STT/TTS/wake word dùng chung RAM/CPU/nhiệt/pin của một điện thoại. Biết ngân sách còn lại của model trước thì chọn STT/TTS hợp lý hơn, và nếu local LLM không khả thi thì phát hiện sớm.

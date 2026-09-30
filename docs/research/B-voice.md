@@ -1,12 +1,12 @@
 # Research B — Voice tiếng Việt
 
-Ngày tra cứu: 2026-09-30. Đây là danh sách ứng viên cho Phase 5, không phải kết quả chạy trên LG G8.
+Ngày tra cứu: 2026-09-30. Thiết bị mục tiêu: Samsung Galaxy Z Flip5 (Snapdragon 8 Gen 2 for Galaxy, RAM 8GB, bộ nhớ trong 512GB). Đây là danh sách ứng viên cho Phase 5, không phải kết quả chạy trên điện thoại.
 
 ## R5 — STT
 
 | Ứng viên | Bằng chứng và giới hạn |
 |---|---|
-| Android SpeechRecognizer on-device | Android có API kiểm tra on-device recognition và tải model ngôn ngữ; khả năng dùng phụ thuộc service/OEM và model đã có trên thiết bị. Không thể khẳng định offline tiếng Việt trước khi kiểm tra G8. |
+| Android SpeechRecognizer on-device | Android có API kiểm tra on-device recognition và tải model ngôn ngữ; khả năng dùng phụ thuộc service/OEM và model đã có trên thiết bị. Không thể khẳng định offline tiếng Việt trước khi kiểm tra Z Flip5. |
 | sherpa-onnx | Có build Android cho ASR và các model tiếng Việt trong danh mục pretrained. Đây là ứng viên offline; kích thước, độ trễ, WER tiếng Việt và tiêu thụ pin phải đo trên máy. |
 | Cloud STT | Có thể làm fallback khi mạng/quyền riêng tư cho phép; provider cụ thể, giá, chính sách dữ liệu và chất lượng chưa được chọn trong repo. |
 
@@ -18,7 +18,7 @@ Benchmark: cùng tập câu tiếng Việt (giọng miền, khoảng cách và n
 
 | Ứng viên | Bằng chứng và giới hạn |
 |---|---|
-| Android TextToSpeech | API cho phép kiểm tra ngôn ngữ/voice có sẵn lúc chạy. G8 có voice tiếng Việt hay không phụ thuộc engine và dữ liệu cài đặt. |
+| Android TextToSpeech | API cho phép kiểm tra ngôn ngữ/voice có sẵn lúc chạy. Z Flip5 có voice tiếng Việt hay không phụ thuộc engine và dữ liệu cài đặt. |
 | sherpa-onnx / Piper voice | sherpa-onnx hỗ trợ Android TTS; Piper có danh mục voice `vi_VN`. Cần xem license của từng voice/model riêng, tải thử và đo chất lượng/tốc độ trên máy. |
 | Cloud TTS | Ứng viên fallback; cần quyết định provider, chi phí, điều khoản và phân loại dữ liệu trước khi dùng. |
 
@@ -43,4 +43,4 @@ Benchmark: false accept/giờ, false reject, độ trễ, tiêu thụ pin và đ
 - STT: so sánh Android on-device với sherpa-onnx offline; cloud chỉ là fallback có điều kiện.
 - TTS: so sánh Android TTS với voice tiếng Việt sherpa/Piper; kiểm license model cụ thể.
 - Wake word tiếng Việt: chưa có model pretrained đã xác nhận trong các nguồn này; giữ mở cho thử nghiệm, không tuyên bố hỗ trợ.
-- Chưa có kết quả latency, chất lượng, pin hoặc khả năng chạy nền trên G8.
+- Chưa có kết quả latency, chất lượng, pin hoặc khả năng chạy nền trên Samsung Galaxy Z Flip5.

@@ -17,10 +17,10 @@ Phase 2, research nhóm C
 - [ ] State machine IDLE → WAKE → LISTENING → PROCESSING → SPEAKING (+ ERROR) và animation mặt robot
 - [ ] Validator + Executor: get_time, get_battery, set_alarm, open_app (whitelist package), set_volume
 - [ ] Client REST tới backend; MockProvider để chạy không cần mạng
-- [ ] Unit test cho validator/executor; test thủ công trên G8
+- [ ] Unit test cho validator/executor; test thủ công trên Samsung Galaxy Z Flip5
 
 ## Definition of Done
-- [ ] Nhập text → robot phản hồi và thực thi action trên G8
+- [ ] Nhập text → robot phản hồi và thực thi action trên Samsung Galaxy Z Flip5
 - [ ] Action ngoài whitelist bị từ chối trên app
 - [ ] Có test cho validator
 

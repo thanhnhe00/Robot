@@ -16,7 +16,7 @@ Action accuracy • JSON validity • Intent accuracy • Tool selection accurac
 
 ## Theo phase
 - [ ] Phase 2: harness v0 + golden set
-- [ ] Phase 4: thêm metric tài nguyên trên G8 (RAM, CPU, pin, nạp model, crash)
+- [ ] Phase 4: thêm metric tài nguyên trên Samsung Galaxy Z Flip5 (RAM, CPU, pin, nạp model, crash)
 - [ ] Phase 5: thêm metric voice
 - [ ] Phase 7: so sánh base vs fine-tuned
 - [ ] Phase 8: metric vision

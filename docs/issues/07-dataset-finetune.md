@@ -17,7 +17,7 @@ Phase 2, Phase 4
 - [ ] Chia train/val/test; golden set giữ nguyên, không rò rỉ
 - [ ] Data card: nguồn, license, cách tạo
 - [ ] Train LoRA/QLoRA trên Colab/Kaggle/cloud — ghi model, dataset, VRAM, thời gian, chi phí ước tính, cách tái lập
-- [ ] So sánh base vs fine-tuned trên toàn bộ metric; lượng tử hóa và chạy thử trên G8
+- [ ] So sánh base vs fine-tuned trên toàn bộ metric; lượng tử hóa và chạy thử trên Samsung Galaxy Z Flip5
 
 ## Definition of Done
 - [ ] Báo cáo base vs fine-tuned có số liệu

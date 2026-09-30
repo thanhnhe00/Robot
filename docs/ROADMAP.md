@@ -1,20 +1,20 @@
 # Robot – Roadmap (cập nhật 2026-09-30, ADR-0002 và ADR-0004)
 
 Thay đổi so với bản gốc:
-- **Spike LLM trên G8 (Phase 4) trước Voice (Phase 5)** – ADR-0002.
+- **Spike LLM trên Samsung Galaxy Z Flip5 (Phase 4) trước Voice (Phase 5)** – ADR-0002.
 - Bổ sung 6 hạng mục xuyên suốt (offline/hybrid, model abstraction, evaluation, dataset strategy, RAG gate, test/reliability) – ADR-0004.
 
 | Phase | Nội dung | Definition of Done (tóm tắt) | Phần cứng |
 |---|---|---|---|
-| 0 | Architecture + Research | Tạm để mở; quay lại review ADR-0005 và đóng các mục Phase 0 sau giai đoạn thực hành | G8, laptop |
+| 0 | Architecture + Research | Tạm để mở; quay lại review ADR-0005 và đóng các mục Phase 0 sau giai đoạn thực hành | Galaxy Z Flip5, laptop |
 | 1 | Backend AI Gateway **+ Model abstraction** | Provider đổi bằng cấu hình, prompt versioned, personality yaml, Docker, CI, Swagger | laptop |
 | 2 | Agent + Action System **+ Evaluation v0** | Action registry, JSON Schema chung, safety pipeline, test an toàn, eval harness, **golden test set** | laptop |
-| 3 | Android app | UI + state machine, Action Executor, `AIProvider` phía Android, nhập text | G8 |
-| 4 | Spike LLM trên G8 **+ Model Manager v0** | `LocalProvider`, benchmark đủ metric, go/no-go | G8 |
-| 5 | Voice | Wake word, STT, TTS tiếng Việt, benchmark từng khối | G8 |
-| 6 | Memory + Tools **+ AI Router + RAG gate** | Memory, tools xác định, router Local/Laptop/Cloud, phân loại riêng tư, offline cơ bản, ADR "cần/không cần RAG" | G8 |
+| 3 | Android app | UI + state machine, Action Executor, `AIProvider` phía Android, nhập text | Galaxy Z Flip5 |
+| 4 | Spike LLM trên Galaxy Z Flip5 **+ Model Manager v0** | `LocalProvider`, benchmark đủ metric, go/no-go | Galaxy Z Flip5 |
+| 5 | Voice | Wake word, STT, TTS tiếng Việt, benchmark từng khối | Galaxy Z Flip5 |
+| 6 | Memory + Tools **+ AI Router + RAG gate** | Memory, tools xác định, router Local/Laptop/Cloud, phân loại riêng tư, offline cơ bản, ADR "cần/không cần RAG" | Galaxy Z Flip5 |
 | 7 | **Dataset strategy** + Fine-tuning | Dataset (sẵn → synthetic → augment → kiểm tay), base vs fine-tuned có số liệu | Colab/Kaggle |
-| 8 | Camera + CV | Object detection, face recognition (prototype) | camera G8 |
+| 8 | Camera + CV | Object detection, face recognition (prototype) | Camera Galaxy Z Flip5 |
 | 9 | ESP32 | Liên kết phone↔ESP32, watchdog, telemetry, test giao tiếp | ESP32 |
 | 10 | Motor + Safety | Motor có giới hạn, e-stop vật lý, dừng khi mất kết nối/vật cản | motor, driver, pin |
 | 11 | Navigation | Né vật cản, đi theo người | sensor |
@@ -35,4 +35,4 @@ Thay đổi so với bản gốc:
 
 Quy tắc thông thường: xong phase trước rồi mới sang phase sau. Ngoại lệ hiện tại: theo chỉ đạo của chủ dự án, thực hành Phase 1 trước và quay lại đóng Phase 0 sau.
 
-Trạng thái tại 2026-09-30: Phase 1 đang được thực hành trước theo chỉ đạo của chủ dự án; Phase 0 research có sẵn nhưng phần review/đóng phase được hoãn. Backend baseline đã có. Benchmark LLM/voice trên G8 và kiểm tra USB phụ thuộc thiết bị được thực hiện ở các phase tương ứng.
+Trạng thái tại 2026-09-30: Phase 1 đang được thực hành trước theo chỉ đạo của chủ dự án; Phase 0 research có sẵn nhưng phần review/đóng phase được hoãn. Backend baseline đã có. Benchmark LLM/voice trên Samsung Galaxy Z Flip5 và kiểm tra USB phụ thuộc thiết bị được thực hiện ở các phase tương ứng.

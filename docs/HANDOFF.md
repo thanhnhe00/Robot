@@ -15,7 +15,7 @@ Ngôn ngữ tài liệu: tiếng Việt. Định danh trong code (tên biến, h
 
 ## 1. Tóm tắt project
 
-**Robot** là robot AI **local-first, hybrid**: điện thoại Android (LG G8) là "bộ não", backend FastAPI chạy trên laptop, về sau có ESP32 làm "thân" để di chuyển.
+**Robot** là robot AI **local-first, hybrid**: điện thoại Android (Samsung Galaxy Z Flip5) là "bộ não", backend FastAPI chạy trên laptop, về sau có ESP32 làm "thân" để di chuyển.
 
 - Giao tiếp tiếng Việt (wake word → STT → AI → TTS), có memory, có agent/tool, thực thi action Android an toàn.
 - Ưu tiên AI chạy trực tiếp trên điện thoại; nếu không đủ thì laptop; nếu cần thì cloud. Không phụ thuộc hoàn toàn cloud.
@@ -39,7 +39,7 @@ Người dùng: Thanh, sinh viên CNTT. Làm trong VS Code, repo GitHub public. 
 
 **Trung thực và quy trình**
 8. Không bịa. Dùng nhãn **CHƯA BIẾT / CẦN RESEARCH / ASSUMPTION**; không biến assumption thành fact.
-9. Không tuyên bố model/engine nào "tốt nhất" hay "chạy tốt trên G8" khi chưa benchmark thật.
+9. Không tuyên bố model/engine nào "tốt nhất" hay "chạy tốt trên Z Flip5" khi chưa benchmark thật.
 10. Trước khi chốt model, thư viện, SDK, engine: kiểm tra tài liệu/nguồn chính thức hiện hành; nguồn cộng đồng phải ghi rõ. Không dựa vào thông tin cũ.
 11. Không tự đổi kiến trúc lớn; mọi quyết định quan trọng ghi **ADR** (Decision / Why / Alternatives / Trade-offs / Chosen / Date) trong `docs/decisions/`.
 12. Làm từng bước nhỏ, báo kết quả, chờ xác nhận. Không đưa quá nhiều code một lần. Nếu bước trước chưa xong thì không nhảy bước sau.
@@ -60,15 +60,15 @@ Người dùng: Thanh, sinh viên CNTT. Làm trong VS Code, repo GitHub public. 
 - Backend FastAPI baseline: `POST /chat`, WebSocket `/ws`, SQLite lưu hội thoại, provider Ollama / Gemini / Mock, kiểm tra action (whitelist, giới hạn tham số), tự thử lại 1 lần khi JSON sai, `API_KEY` tùy chọn. **12 test qua** (với provider mock; chưa test với Ollama/Gemini thật).
 - Hợp đồng dữ liệu: `{"response": "...", "action": {"type": "...", "params": {...}}}`. Action v1: `get_time`, `get_battery`, `set_alarm`, `open_app` (theo `package`), `set_volume`.
 - Cấu trúc repo theo mục 61 của spec: `android/ backend/ ai/ firmware/esp32/ dashboard/ docs/ scripts/ tests/ docker/`.
-- Docs: `ARCHITECTURE.md`, `ROADMAP.md`, `RESEARCH_BACKLOG.md`, ADR-0001…0004, 21 file issue trong `docs/issues/`, script `scripts/create_issues.py`, cấu hình VS Code.
+- Docs: `ARCHITECTURE.md`, `ROADMAP.md`, `RESEARCH_BACKLOG.md`, ADR-0001…0005, 21 file issue trong `docs/issues/`, script `scripts/create_issues.py`, cấu hình VS Code.
 
 **Chưa có / chưa xác nhận**
-- Việc đẩy repo lên GitHub và tạo issue thật bằng `create_issues.py` (script mới chỉ chạy `--dry-run`): **do người dùng xác nhận**.
+- Repo đã có remote GitHub; issue thật từ các file trong `docs/issues/` chưa được xác nhận là đã tạo.
 - Chưa có: Docker, CI, Android app, engine LLM local, STT/TTS/wake word, memory ngoài lịch sử hội thoại, ESP32, camera/CV, dashboard.
-- Chưa có benchmark nào trên G8.
+- Chưa có benchmark nào trên Z Flip5.
 
 **Phần cứng**
-- LG G8 (điện thoại duy nhất, không có máy phụ). Người dùng ghi RAM 8GB, Android 13/14, màn hình/cảm ứng hoạt động — **ASSUMPTION, chưa xác minh** (nguồn tra cứu ghi G8 ThinQ 6GB RAM, Android chính hãng tối đa 11–12). Người dùng bảo bỏ qua việc xác minh; thông số thật sẽ lộ ra khi benchmark ở Phase 4.
+- Thiết bị mục tiêu: Samsung Galaxy Z Flip5, Snapdragon 8 Gen 2 for Galaxy, RAM 8GB, bộ nhớ trong 512GB (cấu hình người dùng chỉ định; thông số khớp tài liệu Samsung). Chưa ghi nhận trực tiếp model/SKU, Android/API và firmware của máy; RAM khả dụng, hiệu năng, nhiệt, pin và tăng tốc runtime cần kiểm tra. Chưa có benchmark trên thiết bị.
 - Laptop dev: Ryzen 7 5700U, 16GB RAM, không GPU, Windows + Linux. Train nặng dùng Colab/Kaggle/cloud (ước tính chi phí trước).
 - Chưa có ESP32, motor, driver, servo, sensor, camera/mic/loa riêng, pin robot.
 
@@ -77,7 +77,7 @@ Người dùng: Thanh, sinh viên CNTT. Làm trong VS Code, repo GitHub public. 
 ## 4. Kiến trúc
 
 ```
- ┌──────────────────────── ANDROID BRAIN (LG G8) ─────────────────────────┐
+ ┌────────────── ANDROID BRAIN (Galaxy Z Flip5, 8GB/512GB) ──────────────┐
  │ UI + State machine: IDLE → WAKE → LISTENING → PROCESSING → SPEAKING    │
  │ Audio: Wake word → VAD → STT                    TTS → Speaker          │
  │ AGENT: Personality (yaml) + Memory + Tool selection                    │
@@ -120,7 +120,7 @@ Ràng buộc offline: wake word, STT/TTS local, LLM local, memory local, Android
 |---|---|---|
 | Framework Android | Kotlin (nghiêng), Flutter | Nghiêng Kotlin vì cần JNI/NDK, audio, service; chốt bằng ADR sau research nhóm C |
 | Engine LLM local | llama.cpp (ứng viên đầu, tự build bằng NDK), MLC, ONNX Runtime GenAI, MediaPipe/LiteRT-LM, ExecuTorch | Research nhóm A |
-| Model | Qwen3 0.6B / 1.7B (ứng viên đầu), 1–2 model nhỏ khác | Benchmark trên G8; quantization Q4_K_M/Q5_K_M/Q6_K/Q8_0 |
+| Model | Qwen3 0.6B / 1.7B (ứng viên đầu), 1–2 model nhỏ khác | Benchmark trên Z Flip5; quantization Q4_K_M/Q5_K_M/Q6_K/Q8_0 |
 | STT / TTS / wake word tiếng Việt | Android SpeechRecognizer, sherpa-onnx, whisper.cpp, cloud; Piper; openWakeWord, Porcupine | Research nhóm B |
 | Phone ↔ ESP32 | USB (nghiêng), BLE, WiFi | Chốt ở Phase 9. Lưu ý USB: phone gắn trên robot nên cáp ngắn; rủi ro là sạc + OTG cùng lúc, rung |
 | Vision | MediaPipe, TFLite, họ YOLO | Kiểm tra license (một số bản là AGPL); Phase 8 |
@@ -130,19 +130,19 @@ Ràng buộc offline: wake word, STT/TTS local, LLM local, memory local, Android
 
 ## 6. Lộ trình chi tiết
 
-Thứ tự đã duyệt (ADR-0002, ADR-0004): spike LLM trên G8 (Phase 4) đặt **trước** Voice (Phase 5). Quy tắc: xong phase trước, báo kết quả, mới sang phase sau.
+Thứ tự đã duyệt (ADR-0002, ADR-0004): spike LLM trên Z Flip5 (Phase 4) đặt **trước** Voice (Phase 5). Quy tắc: xong phase trước, báo kết quả, mới sang phase sau.
 
 | Phase | Nội dung | Phần cứng |
 |---|---|---|
-| 0 | Architecture + Research | G8, laptop |
+| 0 | Architecture + Research | Z Flip5, laptop |
 | 1 | Backend AI Gateway + Model abstraction | laptop |
 | 2 | Agent + Action System + Evaluation v0 | laptop |
-| 3 | Android app | G8 |
-| 4 | Spike LLM trên G8 + Model Manager v0 | G8 |
-| 5 | Voice | G8 |
-| 6 | Memory + Tools + AI Router + RAG gate | G8 |
+| 3 | Android app | Z Flip5 |
+| 4 | Spike LLM trên Z Flip5 + Model Manager v0 | Z Flip5 |
+| 5 | Voice | Z Flip5 |
+| 6 | Memory + Tools + AI Router + RAG gate | Z Flip5 |
 | 7 | Dataset strategy + Fine-tuning | Colab/Kaggle |
-| 8 | Camera + Computer Vision | camera G8 |
+| 8 | Camera + Computer Vision | camera Z Flip5 |
 | 9 | ESP32 + liên kết phone↔ESP32 | ESP32 |
 | 10 | Motor + Safety | motor, driver, pin |
 | 11 | Navigation | sensor |
@@ -180,16 +180,16 @@ Mỗi phase, khi bắt đầu, phải trình đủ 16 mục: mục tiêu, lý do
 Trả lời R1–R4 trong `docs/RESEARCH_BACKLOG.md` để chốt **danh sách ứng viên** cho spike ở Phase 4 (chưa chốt model cuối).
 
 #### Việc cần làm
-- [x] R1–R4: desk research và giới hạn bằng chứng trong `docs/research/A-llm.md`; benchmark G8 thuộc Phase 4.
+- [x] R1–R4: desk research và giới hạn bằng chứng trong `docs/research/A-llm.md`; benchmark Z Flip5 thuộc Phase 4.
 - [x] ADR-0005 Proposed ghi shortlist và các lựa chọn còn phụ thuộc benchmark.
 
 #### Definition of Done
 - [x] Mục chưa biết có nguồn/lý do và bước kiểm chứng.
 - [x] Có shortlist engine + model + quantization để benchmark ở Phase 4.
-- [x] R1–R4 hoàn tất nghiên cứu tài liệu; benchmark trên G8 thuộc Phase 4.
+- [x] R1–R4 hoàn tất nghiên cứu tài liệu; benchmark trên Z Flip5 thuộc Phase 4.
 
 #### Ràng buộc
-Không tuyên bố model nào "tốt nhất" khi chưa benchmark trên G8.
+Không tuyên bố model nào "tốt nhất" khi chưa benchmark trên Z Flip5.
 
 ### [Phase 0] 0.3 Research nhóm B: STT, TTS, wake word tiếng Việt
 
@@ -197,12 +197,12 @@ Không tuyên bố model nào "tốt nhất" khi chưa benchmark trên G8.
 Trả lời R5–R7 để có danh sách ứng viên voice cho Phase 5.
 
 #### Việc cần làm
-- [x] R5–R7: desk research, ứng viên và benchmark plan trong `docs/research/B-voice.md`; kiểm tra trên G8 thuộc Phase 5.
+- [x] R5–R7: desk research, ứng viên và benchmark plan trong `docs/research/B-voice.md`; kiểm tra trên Z Flip5 thuộc Phase 5.
 - [x] ADR-0005 Proposed ghi lựa chọn voice còn mở.
 
 #### Definition of Done
 - [x] Mỗi khối có các hướng khảo sát và kế hoạch benchmark; xem `docs/research/B-voice.md`.
-- [x] R5–R7 hoàn tất nghiên cứu tài liệu; benchmark trên G8 thuộc Phase 5.
+- [x] R5–R7 hoàn tất nghiên cứu tài liệu; benchmark trên Z Flip5 thuộc Phase 5.
 
 ### [Phase 0] 0.4 Research nhóm C: giới hạn Android và liên kết phone-ESP32
 
@@ -210,11 +210,11 @@ Trả lời R5–R7 để có danh sách ứng viên voice cho Phase 5.
 Trả lời R8–R9; đủ thông tin để chọn framework Android và định hướng liên kết với ESP32.
 
 #### Việc cần làm
-- [x] R8–R9: giới hạn API, fallback và điểm chưa xác minh trên G8 trong `docs/research/C-android-hardware.md`.
+- [x] R8–R9: giới hạn API, fallback và điểm chưa xác minh trên Z Flip5 trong `docs/research/C-android-hardware.md`.
 - [x] ADR-0005 Proposed ghi Kotlin là hướng xem xét và để USB/BLE/Wi‑Fi mở đến khi kiểm tra thiết bị.
 
 #### Definition of Done
-- [x] Có danh sách khả năng API và fallback; hành vi riêng của G8 gắn nhãn cần kiểm tra.
+- [x] Có danh sách khả năng API và fallback; hành vi riêng của Z Flip5 gắn nhãn cần kiểm tra.
 - [x] ADR-0005 Proposed ghi framework/transport còn mở.
 - [x] R8–R9 hoàn tất nghiên cứu tài liệu; kiểm tra phần cứng thuộc Phase 3/9.
 
@@ -301,17 +301,17 @@ Phase 2, research nhóm C
 - [ ] State machine IDLE → WAKE → LISTENING → PROCESSING → SPEAKING (+ ERROR) và animation mặt robot
 - [ ] Validator + Executor: get_time, get_battery, set_alarm, open_app (whitelist package), set_volume
 - [ ] Client REST tới backend; MockProvider để chạy không cần mạng
-- [ ] Unit test cho validator/executor; test thủ công trên G8
+- [ ] Unit test cho validator/executor; test thủ công trên Z Flip5
 
 #### Definition of Done
-- [ ] Nhập text → robot phản hồi và thực thi action trên G8
+- [ ] Nhập text → robot phản hồi và thực thi action trên Z Flip5
 - [ ] Action ngoài whitelist bị từ chối trên app
 - [ ] Có test cho validator
 
-### [Phase 4] Spike LLM trên G8 + Model Manager v0
+### [Phase 4] Spike LLM trên Z Flip5 + Model Manager v0
 
 #### Mục tiêu
-Chạy LLM local trên G8, benchmark thật, đưa ra quyết định go/no-go cho local-first (ADR-0002).
+Chạy LLM local trên Z Flip5, benchmark thật, đưa ra quyết định go/no-go cho local-first (ADR-0002).
 
 #### Vì sao cần phase này
 Toàn bộ luận điểm local-first phụ thuộc vào việc này; kết quả quyết định ngân sách cho Voice.
@@ -324,7 +324,7 @@ Phase 3, research nhóm A
 - [ ] Model Manager v0: metadata, version, checksum, đường dẫn lưu, nạp/gỡ model
 - [ ] Benchmark ≥3 model × quantization × context bằng CÙNG bộ prompt
 - [ ] Đo: latency, tokens/sec, RAM, CPU, nhiệt (nếu có API), pin, thời gian nạp model, JSON accuracy, crash rate; thêm chạy liên tục ≥10 phút để thấy throttling
-- [ ] Báo cáo `docs/benchmarks/phase4-llm-g8.md` + ADR go/no-go
+- [ ] Báo cáo `docs/benchmarks/phase4-llm-z-flip5.md` + ADR go/no-go
 
 #### Definition of Done
 - [ ] Có số liệu thật cho từng cấu hình
@@ -395,7 +395,7 @@ Phase 2, Phase 4
 - [ ] Chia train/val/test; golden set giữ nguyên, không rò rỉ
 - [ ] Data card: nguồn, license, cách tạo
 - [ ] Train LoRA/QLoRA trên Colab/Kaggle/cloud — ghi model, dataset, VRAM, thời gian, chi phí ước tính, cách tái lập
-- [ ] So sánh base vs fine-tuned trên toàn bộ metric; lượng tử hóa và chạy thử trên G8
+- [ ] So sánh base vs fine-tuned trên toàn bộ metric; lượng tử hóa và chạy thử trên Z Flip5
 
 #### Definition of Done
 - [ ] Báo cáo base vs fine-tuned có số liệu
@@ -414,7 +414,7 @@ Robot cần "nhìn"; vision và language model có trách nhiệm riêng.
 Phase 3 (Phase 6 cho tích hợp)
 
 #### Việc cần làm
-- [ ] Pipeline camera trên G8
+- [ ] Pipeline camera trên Z Flip5
 - [ ] Object detection: chọn model sau khi kiểm tra license và tốc độ
 - [ ] Face detection + recognition + identity store
 - [ ] Quyền riêng tư: dữ liệu khuôn mặt chỉ lưu local, có xóa/quản lý
@@ -583,7 +583,7 @@ Action accuracy • JSON validity • Intent accuracy • Tool selection accurac
 
 #### Theo phase
 - [ ] Phase 2: harness v0 + golden set
-- [ ] Phase 4: thêm metric tài nguyên trên G8 (RAM, CPU, pin, nạp model, crash)
+- [ ] Phase 4: thêm metric tài nguyên trên Z Flip5 (RAM, CPU, pin, nạp model, crash)
 - [ ] Phase 5: thêm metric voice
 - [ ] Phase 7: so sánh base vs fine-tuned
 - [ ] Phase 8: metric vision
@@ -612,7 +612,7 @@ Mỗi phase có test; Phase 13 tổng hợp end-to-end và reliability.
 - [ ] Chạy test trong CI ở mọi PR
 - [ ] Tài liệu `docs/TESTING.md`
 
-**Định nghĩa hoàn thành toàn project** (Definition of Done tổng): local model chạy trên G8; chế độ trò chuyện + agent + structured action; provider abstraction; Android có UI robot, mic, STT, TTS, local inference, action execution; backend có API, validation, logging, database, Docker, Swagger; memory ngắn/dài hạn; camera + object detection + face recognition (prototype); ESP32 + giao tiếp + motor + e-stop + watchdog + obstacle safety; GitHub + CI/CD + test + tài liệu; benchmark đủ metric; README, sơ đồ, video demo, báo cáo kỹ thuật.
+**Định nghĩa hoàn thành toàn project** (Definition of Done tổng): local model chạy trên Z Flip5; chế độ trò chuyện + agent + structured action; provider abstraction; Android có UI robot, mic, STT, TTS, local inference, action execution; backend có API, validation, logging, database, Docker, Swagger; memory ngắn/dài hạn; camera + object detection + face recognition (prototype); ESP32 + giao tiếp + motor + e-stop + watchdog + obstacle safety; GitHub + CI/CD + test + tài liệu; benchmark đủ metric; README, sơ đồ, video demo, báo cáo kỹ thuật.
 
 ---
 
@@ -632,7 +632,7 @@ Mỗi phase có test; Phase 13 tổng hợp end-to-end và reliability.
 | Ollama + model nhỏ (vd `qwen3:1.7b`) | Khi test provider Ollama | Kiểm tra tên model hiện hành trên thư viện Ollama |
 | Docker Desktop | Phần Docker của Phase 1 | |
 | Android Studio + NDK + CMake | Phase 3 (NDK: Phase 4) | |
-| `adb` + `scrcpy` | Phase 3 | Điều khiển/debug G8 từ laptop |
+| `adb` + `scrcpy` | Phase 3 | Điều khiển/debug Z Flip5 từ laptop |
 | PlatformIO (hoặc ESP-IDF) | Phase 9 | Chốt bằng ADR |
 
 ### 8.3 Tài khoản và khóa
@@ -641,7 +641,7 @@ Mỗi phase có test; Phase 13 tổng hợp end-to-end và reliability.
 - Hugging Face: tải model.
 - Kaggle / Google Colab: cho Phase 7 (kiểm tra hạn mức GPU hiện hành, ghi chi phí nếu dùng bản trả phí).
 
-### 8.4 Điện thoại G8
+### 8.4 Điện thoại Z Flip5
 - Bật Tùy chọn nhà phát triển và Gỡ lỗi USB; cáp USB-C truyền dữ liệu; kiểm tra nhận USB OTG.
 - Ghi lại số liệu thật (RAM, Android, nhiệt độ, pin) trong benchmark Phase 4.
 - Kiểm tra tình trạng pin (benchmark liên tục sẽ làm nóng/hao pin).
@@ -658,7 +658,7 @@ Mỗi phase có test; Phase 13 tổng hợp end-to-end và reliability.
 | Phase 11 | Cảm biến khoảng cách; có thể thêm encoder/IMU |
 | Tùy chọn | Hub USB có cấp nguồn (vừa sạc vừa OTG), mic/loa rời, servo, LED, LiDAR |
 
-Camera dùng camera của G8 trước. Không mua phần cứng trước khi phase tương ứng bắt đầu và người dùng đồng ý.
+Camera dùng camera của Z Flip5 trước. Không mua phần cứng trước khi phase tương ứng bắt đầu và người dùng đồng ý.
 
 ---
 
@@ -666,7 +666,7 @@ Camera dùng camera của G8 trước. Không mua phần cứng trước khi pha
 
 | Rủi ro | Giảm thiểu |
 |---|---|
-| Snapdragon 855 (2019) chậm hơn mục tiêu 3–5 giây; RAM thực có thể khác kỳ vọng | Spike sớm ở Phase 4; router; intent nhẹ cho lệnh xác định; laptop/cloud fallback |
+| Hiệu năng bền vững, RAM khả dụng, nhiệt và pin khi chạy LLM local trên Z Flip5 chưa biết | Đo trong Phase 4; router; intent nhẹ cho lệnh xác định; laptop/cloud fallback |
 | Nóng máy, throttling, hao pin | Benchmark liên tục ≥10 phút; giới hạn thread; nạp model theo nhu cầu |
 | STT/TTS/wake word tiếng Việt local kém | Benchmark từng khối; hybrid với cloud |
 | Hạn chế Android (CẦN KIỂM TRA tài liệu): bật/tắt WiFi bằng code, mic nền cần foreground service | Dùng API chính thức hoặc mở panel cài đặt; thiết kế fallback |
@@ -679,8 +679,8 @@ Camera dùng camera của G8 trước. Không mua phần cứng trước khi pha
 ### Research backlog (Phase 0)
 | # | Chủ đề | Câu hỏi | Nhóm |
 |---|---|---|---|
-| R1 | Engine LLM Android | llama.cpp (build NDK chính thức vs wrapper) vs MLC, ONNX Runtime GenAI, MediaPipe/LiteRT-LM, ExecuTorch: Snapdragon 855, ARM64, GGUF, structured output/grammar, license, bảo trì | A |
-| R2 | Tăng tốc phần cứng | GPU Adreno 640 / DSP có dùng được cho LLM không, hay chỉ CPU | A |
+| R1 | Engine LLM Android | llama.cpp (build NDK chính thức vs wrapper) vs MLC, ONNX Runtime GenAI/QNN, LiteRT-LM, ExecuTorch: Snapdragon 8 Gen 2 for Galaxy / SM8550, ARM64, GGUF, structured output/grammar, license, bảo trì | A |
+| R2 | Tăng tốc phần cứng | GPU Adreno / Qualcomm QNN-HTP có dùng được cho LLM trên Z Flip5 không, hay chỉ CPU | A |
 | R3 | Model benchmark | Model card hiện hành Qwen3 0.6B/1.7B + 1–2 model khác: license, tiếng Việt, tool calling | A |
 | R4 | Quantization | Q4_K_M/Q5_K_M/Q6_K/Q8_0: đánh đổi cho điện thoại | A |
 | R5 | STT tiếng Việt | SpeechRecognizer (offline?), sherpa-onnx, whisper.cpp, cloud | B |

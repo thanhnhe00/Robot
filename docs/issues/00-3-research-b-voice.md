@@ -15,4 +15,4 @@ Trả lời R5–R7 để có danh sách ứng viên voice cho Phase 5.
 
 ## Definition of Done
 - [x] Mỗi khối (STT/TTS/wake word) có từ hai hướng khảo sát trở lên và kế hoạch benchmark.
-- [x] R5–R7 hoàn tất nghiên cứu tài liệu; benchmark trên G8 thuộc Phase 5.
+- [x] R5–R7 hoàn tất nghiên cứu tài liệu; benchmark trên Z Flip5 thuộc Phase 5.
