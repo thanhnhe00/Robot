@@ -1,3 +1,5 @@
+import logging
+import secrets
 from contextlib import asynccontextmanager
 
 import httpx
@@ -12,15 +14,21 @@ from fastapi import (
 
 from .config import settings
 from .db import repository
+from .llm.base import ProviderNotConfiguredError
 from .logging_config import configure_logging
 from .schemas import ChatRequest, ChatResponse
 from .service import handle_chat
 
 configure_logging(settings.log_level)
+log = logging.getLogger("robot")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    if settings.provider == "gemini" and not settings.api_key:
+        log.warning(
+            "Cảnh báo bảo mật: Provider Gemini đang bật nhưng API_KEY bảo vệ backend chưa được thiết lập."
+        )
     repository.initialize()
     yield
 
@@ -34,7 +42,7 @@ app = FastAPI(
 
 
 def check_key(x_api_key: str = Header(default="")) -> None:
-    if settings.api_key and x_api_key != settings.api_key:
+    if settings.api_key and not secrets.compare_digest(x_api_key, settings.api_key):
         raise HTTPException(status_code=401, detail="Sai API key")
 
 
@@ -83,7 +91,7 @@ async def chat(req: ChatRequest):
             status_code=502,
             detail="Không thể kết nối tới AI provider.",
         ) from exc
-    except RuntimeError as exc:
+    except ProviderNotConfiguredError as exc:
         raise HTTPException(
             status_code=503,
             detail="AI provider chưa được cấu hình.",
@@ -92,7 +100,7 @@ async def chat(req: ChatRequest):
 
 @app.websocket("/ws")
 async def ws_chat(ws: WebSocket, key: str = ""):
-    if settings.api_key and key != settings.api_key:
+    if settings.api_key and not secrets.compare_digest(key, settings.api_key):
         await ws.close(code=1008)
         return
 
@@ -105,7 +113,8 @@ async def ws_chat(ws: WebSocket, key: str = ""):
                 await ws.send_json(res.model_dump())
             except WebSocketDisconnect:
                 raise
-            except Exception:
+            except Exception as exc:  # noqa: BLE001  # WebSocket loop fallback for unhandled exceptions
+                log.exception("ws.request_failed", exc_info=exc)
                 await ws.send_json({"error": "Không thể xử lý yêu cầu."})
     except WebSocketDisconnect:
         pass

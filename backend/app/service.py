@@ -14,6 +14,9 @@ log = logging.getLogger("robot")
 provider: AIProvider = get_provider()
 
 
+FALLBACK_RESPONSE = "Xin lỗi, mình chưa hiểu yêu cầu đó."
+
+
 async def handle_chat(session_id: str, text: str) -> ChatResponse:
     request_id = uuid.uuid4().hex
     started = time.perf_counter()
@@ -48,7 +51,7 @@ async def handle_chat(session_id: str, text: str) -> ChatResponse:
                 result = parse_model_output(raw)
                 validation = "retry_recovered"
             except ValueError:
-                result = ChatResponse(response=raw.strip()[:300], action=None)
+                result = ChatResponse(response=FALLBACK_RESPONSE, action=None)
                 validation = "fallback_text"
 
         repository.add_message(session_id, "user", text)
@@ -61,6 +64,7 @@ async def handle_chat(session_id: str, text: str) -> ChatResponse:
                 "request": {"id": request_id, "chars": len(text)},
                 "provider": settings.provider,
                 "model": settings.model_name,
+                "prompt_version": settings.prompt_version,
                 "latency_ms": round((time.perf_counter() - started) * 1000, 2),
                 "response": {"chars": len(result.response)},
                 "action": result.action.type if result.action else None,
@@ -76,8 +80,10 @@ async def handle_chat(session_id: str, text: str) -> ChatResponse:
                 "request": {"id": request_id, "chars": len(text)},
                 "provider": settings.provider,
                 "model": settings.model_name,
+                "prompt_version": settings.prompt_version,
                 "latency_ms": round((time.perf_counter() - started) * 1000, 2),
                 "error_type": type(exc).__name__,
+                "error_detail": str(exc),
             },
         )
         raise

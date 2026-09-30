@@ -1,6 +1,7 @@
 import httpx
 
 from ..config import settings
+from .base import ProviderNotConfiguredError
 
 BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 
@@ -8,7 +9,7 @@ BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 class GeminiProvider:
     async def generate(self, messages: list[dict]) -> str:
         if not settings.gemini_api_key:
-            raise RuntimeError("Thiếu GEMINI_API_KEY trong .env")
+            raise ProviderNotConfiguredError("Thiếu GEMINI_API_KEY trong .env")
         system = "\n".join(m["content"] for m in messages if m["role"] == "system")
         contents = [
             {

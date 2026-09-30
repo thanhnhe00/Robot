@@ -54,17 +54,20 @@ Người dùng: Thanh, sinh viên CNTT. Làm trong VS Code, repo GitHub public. 
 
 ---
 
-## 3. Trạng thái hiện tại (tính đến 2026-09-30)
+## 3. Trạng thái hiện tại (tính đến 2026-10-01)
 
 **Đã có trong repo `Robot` (theo mã nguồn và tài liệu hiện tại)**
-- Backend FastAPI baseline: `POST /chat`, WebSocket `/ws`, SQLite lưu hội thoại, provider Ollama / Gemini / Mock, kiểm tra action (whitelist, giới hạn tham số), tự thử lại 1 lần khi JSON sai, `API_KEY` tùy chọn. **12 test qua** (với provider mock; chưa test với Ollama/Gemini thật).
-- Hợp đồng dữ liệu: `{"response": "...", "action": {"type": "...", "params": {...}}}`. Action v1: `get_time`, `get_battery`, `set_alarm`, `open_app` (theo `package`), `set_volume`.
-- Cấu trúc repo theo mục 61 của spec: `android/ backend/ ai/ firmware/esp32/ dashboard/ docs/ scripts/ tests/ docker/`.
-- Docs: `ARCHITECTURE.md`, `ROADMAP.md`, `RESEARCH_BACKLOG.md`, ADR-0001…0005, 21 file issue trong `docs/issues/`, script `scripts/create_issues.py`, cấu hình VS Code.
+- Backend FastAPI AI Gateway: `POST /chat`, WebSocket `/ws`, SQLite lưu hội thoại qua repository (bật/tắt bằng cấu hình `PERSISTENCE_ENABLED`), `AIProvider` contract hỗ trợ Ollama / Gemini / Mock.
+- Fallback an toàn khi model trả JSON sai: tự động thử lại 1 lần; nếu vẫn sai trả câu cố định `"Xin lỗi, mình chưa hiểu yêu cầu đó."` kèm `action: null` (mục 59 của spec).
+- Prompt versioned (`ai/prompts/v1/system.md`), cấu hình nhân vật tách riêng (`ai/robot_personality.yaml`), Swagger UI có example và mã lỗi chuẩn (401, 502, 503).
+- Logging có cấu trúc JSON (đầy đủ metadata, provider, latency, prompt_version, không log dữ liệu nhạy cảm).
+- Dockerfile và `docker-compose.yml` (bind an toàn `127.0.0.1:8000:8000`).
+- GitHub Actions CI (`.github/workflows/backend.yml` trên `ubuntu-24.04`, ghim `ruff==0.16.9`).
+- **24 test passed** và **0 finding** khi chạy `ruff check backend`.
 
 **Chưa có / chưa xác nhận**
 - Repo đã có remote GitHub; issue thật từ các file trong `docs/issues/` chưa được xác nhận là đã tạo.
-- Chưa có: Docker, CI, Android app, engine LLM local, STT/TTS/wake word, memory ngoài lịch sử hội thoại, ESP32, camera/CV, dashboard.
+- Chưa có: Android app (Phase 3), engine LLM local trên điện thoại (Phase 4), STT/TTS/wake word (Phase 5), memory dài hạn ngoài lịch sử hội thoại (Phase 6), ESP32 / phần cứng (Phase 9+), camera/CV, dashboard.
 - Chưa có benchmark nào trên Z Flip5.
 
 **Phần cứng**
@@ -247,19 +250,21 @@ Phase 0 (tạm hoãn theo chỉ đạo hiện tại)
 
 #### Việc cần làm
 - [x] Baseline đã có `LLMProvider` protocol, factory chọn provider theo `LLM_PROVIDER`, và provider Ollama / Gemini / Mock.
-- [ ] Đối chiếu/chuẩn hóa tên và contract `AIProvider` theo roadmap; thêm test chứng minh thêm provider không cần sửa service.
+- [x] Đối chiếu/chuẩn hóa tên và contract `AIProvider` theo roadmap; thêm test chứng minh thêm provider không cần sửa service.
 - [x] Prompt versioned trong `ai/prompts/v1/system.md`, chọn bằng `PROMPT_VERSION`.
-- [ ] Tách personality vào `robot_personality.yaml`.
-- [ ] Logging có cấu trúc (timestamp, request, model, provider, latency, response, action, validation, lỗi) — không log dữ liệu nhạy cảm
-- [ ] Dockerfile + docker-compose; Swagger có ví dụ request/response/lỗi
-- [ ] CI GitHub Actions: lint, unit test, API test, docker build
-- [ ] Repository/service abstraction cho lưu hội thoại (bật/tắt persistence bằng cấu hình)
+- [x] Tách personality vào `robot_personality.yaml` (đủ các trường theo spec: behavior, response_style, rules).
+- [x] Logging có cấu trúc (timestamp, request, model, provider, latency, response, action, validation, prompt_version, lỗi) — không log dữ liệu nhạy cảm.
+- [x] Dockerfile + docker-compose (bind an toàn `127.0.0.1`); Swagger có ví dụ request/response/lỗi 401, 502, 503.
+- [x] CI GitHub Actions: lint (Ruff ghim bản 0.16.9, runner ubuntu-24.04), unit test, API test, docker build.
+- [x] Repository/service abstraction cho lưu hội thoại (bật/tắt persistence bằng cấu hình `PERSISTENCE_ENABLED`).
+- [x] Fallback chuẩn spec khi JSON sai sau lượt retry ("Xin lỗi, mình chưa hiểu yêu cầu đó.").
 
 #### Definition of Done
-- [ ] Đổi provider chỉ bằng `.env`, không sửa code
-- [ ] CI xanh
-- [ ] `docker compose up` chạy được backend
-- [ ] Có test cho từng provider (mock cho provider ngoài)
+- [x] Đổi provider chỉ bằng `.env`, không sửa code
+- [ ] CI xanh trên GitHub Actions (local Ruff và Pytest 24 passed đã đạt; chờ push commit lên remote)
+- [x] `docker compose up` chạy được backend
+- [x] Có test cho từng provider (mock cho provider ngoài)
+
 
 ### [Phase 2] Agent + Action System + Evaluation v0
 

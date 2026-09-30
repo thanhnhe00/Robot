@@ -1,17 +1,18 @@
 import json
 import logging
-from datetime import datetime, timezone
-
+from datetime import UTC, datetime
 
 _FIELDS = (
     "request",
     "provider",
     "model",
+    "prompt_version",
     "latency_ms",
     "response",
     "action",
     "validation",
     "error_type",
+    "error_detail",
 )
 
 
@@ -19,7 +20,7 @@ class JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         data = {
             "timestamp": datetime.fromtimestamp(
-                record.created, timezone.utc
+                record.created, UTC
             ).isoformat(),
             "level": record.levelname,
             "event": getattr(record, "event", "app.log"),

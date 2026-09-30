@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.backend
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     environment:
       LLM_PROVIDER: ${LLM_PROVIDER:-mock}
       PROMPT_VERSION: ${PROMPT_VERSION:-v1}
