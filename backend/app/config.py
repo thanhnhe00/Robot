@@ -18,7 +18,22 @@ class Settings:
     api_key: str = os.getenv("API_KEY", "")
     history_limit: int = int(os.getenv("HISTORY_LIMIT", "10"))
     db_path: str = os.getenv("DB_PATH", "robot.db")
+    persistence_enabled: bool = os.getenv("PERSISTENCE_ENABLED", "true").lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
     request_timeout: float = float(os.getenv("REQUEST_TIMEOUT", "60"))
+    log_level: str = os.getenv("LOG_LEVEL", "INFO").upper()
+
+    @property
+    def model_name(self) -> str:
+        if self.provider == "ollama":
+            return self.ollama_model
+        if self.provider == "gemini":
+            return self.gemini_model
+        return "mock"
 
 
 settings = Settings()

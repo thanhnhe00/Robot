@@ -1,9 +1,7 @@
 from typing import Protocol
 
 
-class LLMProvider(Protocol):
-    """Giao diện chung. Đổi model = đổi provider, phần còn lại không phải sửa."""
-
+class AIProvider(Protocol):
     async def generate(self, messages: list[dict]) -> str:
-        """messages: [{"role": "system|user|assistant", "content": "..."}]. Trả về text thô."""
+        """Nhận danh sách message và trả về nội dung thô từ model."""
         ...

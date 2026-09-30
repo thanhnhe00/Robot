@@ -1,32 +1,83 @@
 import logging
+import time
+import uuid
 
-from . import db
 from .actions import parse_model_output
 from .config import settings
+from .db import repository
 from .llm import get_provider
+from .llm.base import AIProvider
 from .prompt import RETRY_HINT, SYSTEM_PROMPT
 from .schemas import ChatResponse
 
 log = logging.getLogger("robot")
-provider = get_provider()
+provider: AIProvider = get_provider()
 
 
 async def handle_chat(session_id: str, text: str) -> ChatResponse:
-    history = db.get_history(session_id, settings.history_limit)
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}, *history, {"role": "user", "content": text}]
+    request_id = uuid.uuid4().hex
+    started = time.perf_counter()
 
-    raw = await provider.generate(messages)
     try:
-        result = parse_model_output(raw)
-    except ValueError as e:
-        log.warning("Output lỗi (%s), thử lại 1 lần: %r", e, raw[:200])
-        raw = await provider.generate([*messages, {"role": "user", "content": RETRY_HINT}])
+        history = repository.get_history(session_id, settings.history_limit)
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            *history,
+            {"role": "user", "content": text},
+        ]
+
+        raw = await provider.generate(messages)
+        validation = "valid"
+
         try:
             result = parse_model_output(raw)
         except ValueError:
-            log.error("Vẫn lỗi, dùng text thô: %r", raw[:200])
-            result = ChatResponse(response=raw.strip()[:300], action=None)
+            validation = "retry"
+            log.warning(
+                "chat.output_invalid",
+                extra={
+                    "event": "chat.output_invalid",
+                    "request": {"id": request_id, "chars": len(text)},
+                    "validation": validation,
+                },
+            )
+            raw = await provider.generate(
+                [*messages, {"role": "user", "content": RETRY_HINT}]
+            )
+            try:
+                result = parse_model_output(raw)
+                validation = "retry_recovered"
+            except ValueError:
+                result = ChatResponse(response=raw.strip()[:300], action=None)
+                validation = "fallback_text"
 
-    db.add_message(session_id, "user", text)
-    db.add_message(session_id, "assistant", result.model_dump_json())
-    return result
+        repository.add_message(session_id, "user", text)
+        repository.add_message(session_id, "assistant", result.model_dump_json())
+
+        log.info(
+            "chat.completed",
+            extra={
+                "event": "chat.completed",
+                "request": {"id": request_id, "chars": len(text)},
+                "provider": settings.provider,
+                "model": settings.model_name,
+                "latency_ms": round((time.perf_counter() - started) * 1000, 2),
+                "response": {"chars": len(result.response)},
+                "action": result.action.type if result.action else None,
+                "validation": validation,
+            },
+        )
+        return result
+    except Exception as exc:
+        log.error(
+            "chat.failed",
+            extra={
+                "event": "chat.failed",
+                "request": {"id": request_id, "chars": len(text)},
+                "provider": settings.provider,
+                "model": settings.model_name,
+                "latency_ms": round((time.perf_counter() - started) * 1000, 2),
+                "error_type": type(exc).__name__,
+            },
+        )
+        raise
