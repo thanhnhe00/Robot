@@ -1,0 +1,169 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/thanhnhe00/Robot/ai/schemas/action_schema.json",
+  "title": "Robot Action Schema",
+  "description": "JSON Schema dùng chung cho action của Robot. Backend (Pydantic) và Android (Kotlin) đều sinh từ schema này. LLM chỉ đề xuất, validator mới quyết định.",
+
+  "definitions": {
+    "action": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "get_time",
+            "get_battery",
+            "set_alarm",
+            "open_app",
+            "set_volume",
+            "move",
+            "stop"
+          ]
+        },
+        "params": {
+          "type": "object",
+          "default": {}
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "get_time" } } },
+          "then": { "properties": { "params": { "type": "object", "additionalProperties": false } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "get_battery" } } },
+          "then": { "properties": { "params": { "type": "object", "additionalProperties": false } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "set_alarm" } } },
+          "then": {
+            "properties": {
+              "params": {
+                "type": "object",
+                "required": ["time"],
+                "properties": {
+                  "time": {
+                    "type": "string",
+                    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+                    "description": "Thời gian báo thức, định dạng HH:MM (24 giờ)."
+                  },
+                  "label": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "Nhãn tùy chọn cho báo thức."
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "open_app" } } },
+          "then": {
+            "properties": {
+              "params": {
+                "type": "object",
+                "required": ["package"],
+                "properties": {
+                  "package": {
+                    "type": "string",
+                    "enum": [
+                      "com.google.android.youtube",
+                      "com.android.chrome",
+                      "com.android.settings",
+                      "com.spotify.music"
+                    ],
+                    "description": "Package name Android, chỉ trong whitelist."
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "set_volume" } } },
+          "then": {
+            "properties": {
+              "params": {
+                "type": "object",
+                "required": ["level"],
+                "properties": {
+                  "level": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Mức âm lượng 0-100."
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "move" } } },
+          "then": {
+            "properties": {
+              "params": {
+                "type": "object",
+                "required": ["direction"],
+                "properties": {
+                  "direction": {
+                    "type": "string",
+                    "enum": ["forward", "backward", "left", "right"],
+                    "description": "Hướng di chuyển."
+                  },
+                  "speed": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "default": 50,
+                    "description": "Tốc độ 0-100."
+                  },
+                  "duration_ms": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 5000,
+                    "default": 1000,
+                    "description": "Thời gian di chuyển, tối đa 5 giây."
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "stop" } } },
+          "then": { "properties": { "params": { "type": "object", "additionalProperties": false } } }
+        }
+      ],
+      "additionalProperties": false
+    },
+
+    "model_output": {
+      "type": "object",
+      "required": ["response"],
+      "properties": {
+        "response": {
+          "type": "string",
+          "description": "Câu robot sẽ nói. Để rỗng nếu action tự xử lý."
+        },
+        "action": {
+          "oneOf": [
+            { "$ref": "#/definitions/action" },
+            { "type": "null" }
+          ],
+          "description": "Action LLM đề xuất. null nếu chỉ trò chuyện."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+
+  "type": "object",
+  "$ref": "#/definitions/model_output"
+}

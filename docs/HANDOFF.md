@@ -63,7 +63,12 @@ Người dùng: Thanh, sinh viên CNTT. Làm trong VS Code, repo GitHub public. 
 - Logging có cấu trúc JSON (đầy đủ metadata, provider, latency, prompt_version, không log dữ liệu nhạy cảm).
 - Dockerfile và `docker-compose.yml` (bind an toàn `127.0.0.1:8000:8000`).
 - GitHub Actions CI (`.github/workflows/backend.yml` trên `ubuntu-24.04`, ghim `ruff==0.16.9`).
-- **24 test passed** và **0 finding** khi chạy `ruff check backend`.
+- **Phase 2 hoàn thành:**
+  - Action Registry & Safety Pipeline (`ai/schemas/action_schema.json`, `backend/app/action_registry.py`, `backend/app/actions.py`): kiểm tra nghiêm ngặt whitelist, kiểu/khoảng tham số, quyền, trạng thái phần cứng (STUB cho `move`/`stop` bị từ chối an toàn khi chưa có ESP32).
+  - Golden test set 120 mẫu đa dạng, kiểm tay độc lập với tập train (`ai/datasets/golden_v0.jsonl`, `ai/datasets/README.md`).
+  - Evaluation Harness v0 (`scripts/evaluate.py`): đo JSON validity, action accuracy, params accuracy, tool selection accuracy, latency và tự động lưu báo cáo markdown ở `docs/benchmarks/`.
+  - Safety Test Suite bao phủ mục 58 spec (`backend/tests/test_safety.py`).
+- **83 test passed** và **0 finding** khi chạy `ruff check backend scripts`.
 
 **Chưa có / chưa xác nhận**
 - Repo đã có remote GitHub; issue thật từ các file trong `docs/issues/` chưa được xác nhận là đã tạo.
@@ -278,17 +283,17 @@ LLM chỉ đề xuất; phải có lớp kiểm tra trước khi thực thi. Eva
 Phase 1
 
 #### Việc cần làm
-- [ ] JSON Schema chung cho action; sinh model Pydantic (kế hoạch sinh Kotlin cho Phase 3)
-- [ ] Action registry: get_time, get_battery, set_alarm, open_app, set_volume (+ khung cho move/stop, chưa nối phần cứng)
-- [ ] Xử lý JSON sai: validate → repair/retry → không execute → fallback "Xin lỗi, mình chưa hiểu yêu cầu đó."
-- [ ] Test an toàn (mục 58): action hợp lệ/không hợp lệ, thiếu/sai kiểu tham số, action lạ, ngoài phạm vi, không có quyền, JSON lỗi, tool bịa, timeout
-- [ ] Golden test set ~100–200 mẫu (kiểm tay, KHÔNG dùng để train) + `ai/datasets/README.md` (nguồn, cách tạo)
-- [ ] Eval harness v0: JSON validity, action accuracy, intent accuracy, tool selection accuracy; kết quả lưu ở `docs/benchmarks/`
+- [x] JSON Schema chung cho action (`ai/schemas/action_schema.json`); sinh model Pydantic (kế hoạch sinh Kotlin cho Phase 3)
+- [x] Action registry: get_time, get_battery, set_alarm, open_app, set_volume (+ khung cho move/stop, chưa nối phần cứng)
+- [x] Xử lý JSON sai: validate → repair/retry → không execute → fallback "Xin lỗi, mình chưa hiểu yêu cầu đó."
+- [x] Test an toàn (mục 58): action hợp lệ/không hợp lệ, thiếu/sai kiểu tham số, action lạ, ngoài phạm vi, không có quyền, JSON lỗi, tool bịa, timeout
+- [x] Golden test set ~120 mẫu (kiểm tay, KHÔNG dùng để train) + `ai/datasets/README.md` (nguồn, cách tạo)
+- [x] Eval harness v0: JSON validity, action accuracy, intent accuracy, tool selection accuracy; kết quả lưu ở `docs/benchmarks/`
 
 #### Definition of Done
-- [ ] Action ngoài whitelist luôn bị từ chối (có test)
-- [ ] Eval chạy bằng 1 lệnh, cho ra bảng số liệu
-- [ ] Golden set tách khỏi tập train
+- [x] Action ngoài whitelist luôn bị từ chối (có test)
+- [x] Eval chạy bằng 1 lệnh, cho ra bảng số liệu
+- [x] Golden set tách khỏi tập train
 
 ### [Phase 3] Android app (Robot UI + Action Executor)
 

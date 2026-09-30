@@ -51,7 +51,9 @@ def gh(args, dry, capture=True):
     print("  $ gh " + " ".join(a if " " not in a else f'"{a[:40]}"' for a in args))
     if dry:
         return ""
-    r = subprocess.run(["gh", *args], capture_output=True, text=True, encoding="utf-8")
+    r = subprocess.run(
+        ["gh", *args], capture_output=True, text=True, encoding="utf-8", check=False
+    )
     if r.returncode != 0:
         print("    !", r.stderr.strip())
         return None

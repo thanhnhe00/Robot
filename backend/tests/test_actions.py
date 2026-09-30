@@ -1,3 +1,5 @@
+"""Test cho module actions.py — cập nhật Phase 2 dùng action_registry."""
+
 import pytest
 
 from app.actions import parse_model_output, validate_action
@@ -27,6 +29,9 @@ def test_invalid_json_raises():
         {"type": "open_app", "params": {}},
         {"type": "set_volume", "params": {"level": 500}},
         "không phải dict",
+        # Phase 2: STUB actions bị từ chối
+        {"type": "move", "params": {"direction": "forward"}},
+        {"type": "stop", "params": {}},
     ],
 )
 def test_bad_actions_dropped(raw):
@@ -37,3 +42,6 @@ def test_good_actions_kept():
     assert validate_action({"type": "set_alarm", "params": {"time": "07:30"}}).params == {"time": "07:30"}
     yt = "com.google.android.youtube"
     assert validate_action({"type": "open_app", "params": {"package": yt}}).params == {"package": yt}
+    assert validate_action({"type": "set_volume", "params": {"level": 50}}).params == {"level": 50}
+    assert validate_action({"type": "get_time", "params": {}}).type == "get_time"
+    assert validate_action({"type": "get_battery", "params": {}}).type == "get_battery"
