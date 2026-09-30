@@ -15,4 +15,4 @@ milestone: Phase 0
 
 ## Definition of Done
 - [x] `python -m pytest -q` → `12 passed`
-- [ ] Code + docs đã được đưa lên GitHub (đóng issue này sau khi push)
+- [x] Code + docs đã được đưa lên GitHub (đóng issue này sau khi push)
