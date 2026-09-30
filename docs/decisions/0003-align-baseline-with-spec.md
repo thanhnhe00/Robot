@@ -8,7 +8,7 @@ Decision:
 - Cấu trúc repo theo mục 61 (thư mục `ai/` thay cho `model/`, thêm `dashboard/`, `scripts/`, `tests/`, `docker/`, `firmware/esp32/`).
 
 Why:
-Khớp spec ROBOTV1 để các phase sau không phải đổi hợp đồng dữ liệu.
+Khớp spec dự án Robot để các phase sau không phải đổi hợp đồng dữ liệu.
 
 Alternatives:
 Giữ hợp đồng cũ và sửa sau.

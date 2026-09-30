@@ -13,7 +13,8 @@ Model thay đổi rất nhanh; app và dataset không được khóa vào một 
 Phase 0
 
 ## Việc cần làm
-- [ ] Interface `AIProvider` + provider Ollama / Gemini / Mock (thêm provider mới không sửa service)
+- [x] Baseline đã có `LLMProvider` protocol, factory chọn provider theo `LLM_PROVIDER`, và provider Ollama / Gemini / Mock.
+- [ ] Đối chiếu/chuẩn hóa tên và contract `AIProvider` theo roadmap; thêm test chứng minh thêm provider không cần sửa service.
 - [ ] Prompt đưa vào `ai/prompts/` có version; personality trong `robot_personality.yaml`
 - [ ] Logging có cấu trúc (timestamp, request, model, provider, latency, response, action, validation, lỗi) — không log dữ liệu nhạy cảm
 - [ ] Dockerfile + docker-compose; Swagger có ví dụ request/response/lỗi

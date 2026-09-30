@@ -1,4 +1,4 @@
-# ROBOTV1 – Roadmap (cập nhật 2026-09-29, ADR-0002 và ADR-0004)
+# Robot – Roadmap (cập nhật 2026-09-30, ADR-0002 và ADR-0004)
 
 Thay đổi so với bản gốc:
 - **Spike LLM trên G8 (Phase 4) trước Voice (Phase 5)** – ADR-0002.
@@ -6,7 +6,7 @@ Thay đổi so với bản gốc:
 
 | Phase | Nội dung | Definition of Done (tóm tắt) | Phần cứng |
 |---|---|---|---|
-| 0 | Architecture + Research | Docs, ADR, research backlog xử lý xong, khung repo | G8, laptop |
+| 0 | Architecture + Research | Research R1–R9 có nguồn, ứng viên và giới hạn được ghi rõ; ADR cần thiết được rà soát; issue Phase 0 đóng theo DoD | G8, laptop |
 | 1 | Backend AI Gateway **+ Model abstraction** | `AIProvider` (đổi model bằng cấu hình), prompt versioned, personality yaml, Docker, CI, Swagger | laptop |
 | 2 | Agent + Action System **+ Evaluation v0** | Action registry, JSON Schema chung, safety pipeline, test an toàn, eval harness, **golden test set** | laptop |
 | 3 | Android app | UI + state machine, Action Executor, `AIProvider` phía Android, nhập text | G8 |
@@ -34,3 +34,5 @@ Thay đổi so với bản gốc:
 | RAG | Chỉ làm nếu benchmark chứng minh cần (Phase 6) | Phase 6 |
 
 Quy tắc: xong phase trước, báo kết quả, mới sang phase sau. Docker và CI tối thiểu bắt đầu từ Phase 1.
+
+Trạng thái tại 2026-09-30: Phase 0 chưa đóng; backend baseline đã có. Benchmark LLM/voice trên G8 và kiểm tra USB phụ thuộc thiết bị được thực hiện ở các phase tương ứng, không được coi là đã xong chỉ từ nghiên cứu tài liệu.

@@ -7,12 +7,12 @@ milestone: Phase 0
 Trả lời R5–R7 để có danh sách ứng viên voice cho Phase 5.
 
 ## Việc cần làm
-- [ ] R5: STT tiếng Việt: Android SpeechRecognizer (có offline không), sherpa-onnx, whisper.cpp, cloud — model Việt có sẵn, dung lượng, độ trễ
-- [ ] R6: TTS tiếng Việt: giọng Việt của Android TTS, Piper/sherpa-onnx, cloud
-- [ ] R7: Wake word cho "Hey Robot": openWakeWord, Porcupine, sherpa-onnx KWS — khả năng dùng, tiêu thụ pin, license
-- [ ] Viết `docs/research/B-voice.md` (nguồn + ngày)
-- [ ] ADR (Proposed): ứng viên voice cho Phase 5
+- [x] R5: So sánh Android on-device, sherpa-onnx Vietnamese ASR và cloud fallback; ghi rõ availability/benchmark chưa xác nhận.
+- [x] R6: So sánh Android TTS, sherpa/Piper và cloud; ghi yêu cầu kiểm voice/license cụ thể.
+- [x] R7: Ghi tình trạng hỗ trợ ngôn ngữ của openWakeWord/Porcupine và khoảng trống Vietnamese KWS.
+- [x] Viết `docs/research/B-voice.md` với nguồn chính thức và ngày tra cứu.
+- [x] Ghi ứng viên và tiêu chí đánh giá trong ADR-0005 (Proposed); đo thực tế thuộc Phase 5.
 
 ## Definition of Done
-- [ ] Mỗi khối (STT/TTS/wake word) có ≥2 ứng viên và kế hoạch benchmark
-- [ ] R5–R7 chuyển `DONE`
+- [x] Mỗi khối (STT/TTS/wake word) có từ hai hướng khảo sát trở lên và kế hoạch benchmark.
+- [x] R5–R7 hoàn tất nghiên cứu tài liệu; benchmark trên G8 thuộc Phase 5.

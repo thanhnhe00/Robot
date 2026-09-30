@@ -1,6 +1,6 @@
-# ROBOTV1 – Architecture (v0.1, Phase 0)
+# Robot – Architecture (v0.1, Phase 0)
 
-Trạng thái: **bản nháp kiến trúc**. Mọi thay đổi lớn phải có Decision Record trong `docs/decisions/`.
+Trạng thái: **bản nháp kiến trúc; Phase 0 đang hoàn thiện**. Mọi thay đổi lớn phải có Decision Record trong `docs/decisions/`.
 
 ## Nguyên tắc
 1. **Local-first, hybrid:** điện thoại → laptop/local server → cloud. Không phụ thuộc hoàn toàn cloud.
@@ -57,3 +57,5 @@ Hiện tại (Phase 1 baseline) luật nằm trong `backend/app/actions.py`.
 | Engine LLM local, model, STT, TTS, wake word | **CHƯA CHỐT** – xem `RESEARCH_BACKLOG.md` |
 | Android: Kotlin hay Flutter | Nghiêng Kotlin, **chưa chốt** |
 | Phone ↔ ESP32 | Nghiêng USB, **chưa chốt** |
+
+Kết quả nghiên cứu và giới hạn bằng chứng hiện có được ghi trong `docs/research/`. Tài liệu nền tảng không xác nhận hiệu năng trên LG G8. Đặc biệt, tăng tốc GPU/DSP, phiên bản Android/RAM thực tế, voice tiếng Việt có sẵn và khả năng vừa sạc vừa dùng USB host phải được đo hoặc kiểm tra trên thiết bị trước khi chốt.

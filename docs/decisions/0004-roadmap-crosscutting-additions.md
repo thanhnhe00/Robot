@@ -6,7 +6,7 @@ Decision:
 Bổ sung vào roadmap: (1) offline-first/hybrid router, (2) model abstraction, (3) evaluation xuyên suốt, (4) dataset strategy, (5) RAG chỉ khi có bằng chứng, (6) test + reliability. Thêm hai điểm phát hiện thêm: Model Manager update/rollback (Phase 12) và phân loại riêng tư LOCAL ONLY / OPTIONAL CLOUD / PUBLIC (Phase 6).
 
 Why:
-Bản bảng phase gọn chưa thể hiện rõ các yêu cầu này của spec ROBOTV1; nếu không ghi rõ sẽ dễ bị bỏ sót hoặc làm muộn.
+Bản bảng phase gọn chưa thể hiện rõ các yêu cầu này của spec dự án Robot; nếu không ghi rõ sẽ dễ bị bỏ sót hoặc làm muộn.
 
 Alternatives:
 1. Tạo phase riêng cho từng hạng mục (làm roadmap dài, tách rời khỏi nơi chúng thực sự được dùng).

@@ -4,7 +4,7 @@ labels: phase-0, docs
 milestone: Phase 0
 ---
 ## Mục tiêu
-Đưa baseline backend về đúng spec ROBOTV1 và dựng khung tài liệu/ADR.
+Đưa baseline backend về đúng spec của dự án Robot và dựng khung tài liệu/ADR.
 
 ## Việc đã làm
 - [x] Đổi `reply` → `response`; `open_app` dùng `params.package`, whitelist theo package (ADR-0003)

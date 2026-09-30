@@ -19,3 +19,4 @@ Chosen:
 | 0002 | Spike LLM trên G8 trước Voice | Accepted |
 | 0003 | Đồng bộ baseline backend với spec | Accepted |
 | 0004 | Bổ sung 6 hạng mục xuyên suốt vào roadmap | Accepted |
+| 0005 | Phase 0 research shortlists và các lựa chọn phụ thuộc thiết bị | Proposed |

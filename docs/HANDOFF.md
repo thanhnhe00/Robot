@@ -1,4 +1,4 @@
-# ROBOTV1 – Handoff Brief (cho AI coding agent / IDE)
+# Robot – Handoff Brief (cho AI coding agent / IDE)
 
 Tổng hợp ngày 2026-09-30. Đây là tài liệu tự đủ: đọc xong là hiểu project, quy tắc, trạng thái, lộ trình và việc cần chuẩn bị.
 Ngôn ngữ tài liệu: tiếng Việt. Định danh trong code (tên biến, hàm, trường JSON): tiếng Anh.
@@ -7,15 +7,15 @@ Ngôn ngữ tài liệu: tiếng Việt. Định danh trong code (tên biến, h
 
 ## 0. Prompt khởi động (dán vào agent)
 
-> Bạn là kỹ sư phần mềm/AI/robotics làm việc trong repo ROBOTV1. Đọc toàn bộ `docs/HANDOFF.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/RESEARCH_BACKLOG.md` và `docs/decisions/`.
-> Tuân thủ mục 2 (Quy tắc bất biến). Chỉ làm **một issue mỗi lần**, bắt đầu từ issue Phase 0 chưa xong (hiện là **0.2 Research nhóm A**). Không viết code ứng dụng mới trước khi Phase 0 hoàn tất.
+> Bạn là kỹ sư phần mềm/AI/robotics làm việc trong repo `Robot`. Lấy nội dung repo này làm nguồn sự thật về trạng thái dự án. Đọc toàn bộ `docs/HANDOFF.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/RESEARCH_BACKLOG.md` và `docs/decisions/`.
+> Tuân thủ mục 2 (Quy tắc bất biến). Chỉ làm **một issue mỗi lần**, tiếp tục các issue Phase 0 đang mở. Backend baseline đã có; không dựng lại từ đầu. Hoàn tất Phase 0 trước khi mở rộng triển khai Phase 1.
 > Với mỗi issue: tóm tắt kế hoạch trước, chờ xác nhận, làm, chạy test, rồi báo kết quả (đã làm gì, bằng chứng, việc còn lại, điều chưa chắc). Không tự đổi kiến trúc: nếu phát hiện vấn đề thì dừng, giải thích, đưa phương án và trade-off.
 
 ---
 
 ## 1. Tóm tắt project
 
-**ROBOTV1** là robot AI **local-first, hybrid**: điện thoại Android (LG G8) là "bộ não", backend FastAPI chạy trên laptop, về sau có ESP32 làm "thân" để di chuyển.
+**Robot** là robot AI **local-first, hybrid**: điện thoại Android (LG G8) là "bộ não", backend FastAPI chạy trên laptop, về sau có ESP32 làm "thân" để di chuyển.
 
 - Giao tiếp tiếng Việt (wake word → STT → AI → TTS), có memory, có agent/tool, thực thi action Android an toàn.
 - Ưu tiên AI chạy trực tiếp trên điện thoại; nếu không đủ thì laptop; nếu cần thì cloud. Không phụ thuộc hoàn toàn cloud.
@@ -56,7 +56,7 @@ Người dùng: Thanh, sinh viên CNTT. Làm trong VS Code, repo GitHub public. 
 
 ## 3. Trạng thái hiện tại (tính đến 2026-09-30)
 
-**Đã có (trong repo `robot/`)**
+**Đã có trong repo `Robot` (theo mã nguồn và tài liệu hiện tại)**
 - Backend FastAPI baseline: `POST /chat`, WebSocket `/ws`, SQLite lưu hội thoại, provider Ollama / Gemini / Mock, kiểm tra action (whitelist, giới hạn tham số), tự thử lại 1 lần khi JSON sai, `API_KEY` tùy chọn. **12 test qua** (với provider mock; chưa test với Ollama/Gemini thật).
 - Hợp đồng dữ liệu: `{"response": "...", "action": {"type": "...", "params": {...}}}`. Action v1: `get_time`, `get_battery`, `set_alarm`, `open_app` (theo `package`), `set_volume`.
 - Cấu trúc repo theo mục 61 của spec: `android/ backend/ ai/ firmware/esp32/ dashboard/ docs/ scripts/ tests/ docker/`.
@@ -154,12 +154,14 @@ Mốc gợi ý: **dừng sau Phase 7** vẫn là project đủ mạnh để xin 
 
 Mỗi phase, khi bắt đầu, phải trình đủ 16 mục: mục tiêu, lý do, input, output, kiến trúc, công nghệ, cấu trúc thư mục, luồng dữ liệu, kế hoạch triển khai, code, test, benchmark (nếu phù hợp), security, safety, troubleshooting, Definition of Done. Các issue bên dưới là khung sườn, sẽ tách thành issue con khi tới phase.
 
-### 6.0 Phase 0 – Architecture + Research (đang làm)
+### 6.0 Phase 0 – Architecture + Research (đang hoàn thiện)
+
+**Trạng thái đối chiếu repo:** Phase 0 chưa đóng. Nghiên cứu tài liệu R1–R9 đã được bổ sung trong `docs/research/`; các quyết định về model/runtime và các kiểm tra phụ thuộc thiết bị vẫn là ứng viên/việc cần benchmark, không phải kết quả đã xác nhận trên LG G8. Phase 1 có backend baseline; các hạng mục DoD trong issue `01-backend-gateway.md` vẫn đang mở.
 
 ### [Phase 0] 0.1 Đồng bộ baseline và dựng khung tài liệu
 
 #### Mục tiêu
-Đưa baseline backend về đúng spec ROBOTV1 và dựng khung tài liệu/ADR.
+Đưa baseline backend về đúng spec của dự án Robot và dựng khung tài liệu/ADR.
 
 #### Việc đã làm
 - [x] Đổi `reply` → `response`; `open_app` dùng `params.package`, whitelist theo package (ADR-0003)
@@ -178,17 +180,13 @@ Mỗi phase, khi bắt đầu, phải trình đủ 16 mục: mục tiêu, lý do
 Trả lời R1–R4 trong `docs/RESEARCH_BACKLOG.md` để chốt **danh sách ứng viên** cho spike ở Phase 4 (chưa chốt model cuối).
 
 #### Việc cần làm
-- [ ] R1: So sánh engine (llama.cpp build NDK chính thức vs wrapper, MLC, ONNX Runtime GenAI, MediaPipe/LiteRT-LM, ExecuTorch): Android + Snapdragon 855, ARM64, GGUF, structured output/grammar, license, mức độ bảo trì
-- [ ] R2: GPU (Adreno 640) / DSP có dùng được cho LLM trên 855 không; nếu không → CPU-only
-- [ ] R3: Model card hiện hành của Qwen3 0.6B/1.7B + 1–2 model nhỏ khác: license, tiếng Việt, tool calling, dung lượng GGUF
-- [ ] R4: Quantization Q4_K_M / Q5_K_M / Q6_K / Q8_0: đánh đổi chất lượng, RAM, tốc độ
-- [ ] Viết `docs/research/A-llm.md`: mỗi kết luận có link nguồn + ngày; nguồn cộng đồng ghi rõ
-- [ ] ADR (Proposed): engine ứng viên cho Phase 4; ADR (Proposed): shortlist model
+- [x] R1–R4: desk research và giới hạn bằng chứng trong `docs/research/A-llm.md`; benchmark G8 thuộc Phase 4.
+- [x] ADR-0005 Proposed ghi shortlist và các lựa chọn còn phụ thuộc benchmark.
 
 #### Definition of Done
-- [ ] Không còn mục nào ghi CHƯA BIẾT mà chưa có nguồn hoặc lý do
-- [ ] Có shortlist engine + model + quantization để benchmark ở Phase 4
-- [ ] R1–R4 chuyển `DONE` trong `RESEARCH_BACKLOG.md`
+- [x] Mục chưa biết có nguồn/lý do và bước kiểm chứng.
+- [x] Có shortlist engine + model + quantization để benchmark ở Phase 4.
+- [x] R1–R4 hoàn tất nghiên cứu tài liệu; benchmark trên G8 thuộc Phase 4.
 
 #### Ràng buộc
 Không tuyên bố model nào "tốt nhất" khi chưa benchmark trên G8.
@@ -199,15 +197,12 @@ Không tuyên bố model nào "tốt nhất" khi chưa benchmark trên G8.
 Trả lời R5–R7 để có danh sách ứng viên voice cho Phase 5.
 
 #### Việc cần làm
-- [ ] R5: STT tiếng Việt: Android SpeechRecognizer (có offline không), sherpa-onnx, whisper.cpp, cloud — model Việt có sẵn, dung lượng, độ trễ
-- [ ] R6: TTS tiếng Việt: giọng Việt của Android TTS, Piper/sherpa-onnx, cloud
-- [ ] R7: Wake word cho "Hey Robot": openWakeWord, Porcupine, sherpa-onnx KWS — khả năng dùng, tiêu thụ pin, license
-- [ ] Viết `docs/research/B-voice.md` (nguồn + ngày)
-- [ ] ADR (Proposed): ứng viên voice cho Phase 5
+- [x] R5–R7: desk research, ứng viên và benchmark plan trong `docs/research/B-voice.md`; kiểm tra trên G8 thuộc Phase 5.
+- [x] ADR-0005 Proposed ghi lựa chọn voice còn mở.
 
 #### Definition of Done
-- [ ] Mỗi khối (STT/TTS/wake word) có ≥2 ứng viên và kế hoạch benchmark
-- [ ] R5–R7 chuyển `DONE`
+- [x] Mỗi khối có các hướng khảo sát và kế hoạch benchmark; xem `docs/research/B-voice.md`.
+- [x] R5–R7 hoàn tất nghiên cứu tài liệu; benchmark trên G8 thuộc Phase 5.
 
 ### [Phase 0] 0.4 Research nhóm C: giới hạn Android và liên kết phone-ESP32
 
@@ -215,28 +210,25 @@ Trả lời R5–R7 để có danh sách ứng viên voice cho Phase 5.
 Trả lời R8–R9; đủ thông tin để chọn framework Android và định hướng liên kết với ESP32.
 
 #### Việc cần làm
-- [ ] R8: Giới hạn Android theo tài liệu chính thức: mic nền (foreground service), báo thức (`AlarmClock` intent), âm lượng, WiFi (hạn chế từ Android 10), mở app, quyền cần khai báo
-- [ ] So sánh Kotlin native vs Flutter theo tiêu chí mục 20 (local AI, audio, camera, service, JNI/NDK, portfolio)
-- [ ] R9: USB host + sạc cùng lúc, thư viện serial cho Android, so với BLE/WiFi (độ trễ, độ tin cậy, pin, độ phức tạp)
-- [ ] Viết `docs/research/C-android-hardware.md` (nguồn + ngày)
-- [ ] ADR (Proposed): framework Android; ghi nhận hướng liên kết ESP32 (quyết định cuối ở Phase 9)
+- [x] R8–R9: giới hạn API, fallback và điểm chưa xác minh trên G8 trong `docs/research/C-android-hardware.md`.
+- [x] ADR-0005 Proposed ghi Kotlin là hướng xem xét và để USB/BLE/Wi‑Fi mở đến khi kiểm tra thiết bị.
 
 #### Definition of Done
-- [ ] Danh sách action Android nào làm được / không làm được / cần fallback
-- [ ] Có ADR Proposed cho framework Android
-- [ ] R8–R9 chuyển `DONE`
+- [x] Có danh sách khả năng API và fallback; hành vi riêng của G8 gắn nhãn cần kiểm tra.
+- [x] ADR-0005 Proposed ghi framework/transport còn mở.
+- [x] R8–R9 hoàn tất nghiên cứu tài liệu; kiểm tra phần cứng thuộc Phase 3/9.
 
 ### [Phase 0] 0.5 Chốt Phase 0
 
 #### Việc cần làm
-- [ ] Cập nhật `docs/RESEARCH_BACKLOG.md` (R1–R9 = DONE, R10 giữ OPEN cho Phase 8)
-- [ ] Chuyển các ADR Proposed thành Accepted/Rejected sau khi thống nhất
-- [ ] Cập nhật mục "Trạng thái các thành phần" trong `docs/ARCHITECTURE.md`
-- [ ] Rà lại `docs/ROADMAP.md`
+- [x] Cập nhật `docs/RESEARCH_BACKLOG.md`: R1–R9 desk research DONE, R10 giữ OPEN cho Phase 8; đo thiết bị ở các phase tương ứng.
+- [ ] Chủ dự án review ADR-0005 Proposed và quyết định Accepted/Rejected.
+- [x] Cập nhật mục "Trạng thái các thành phần" trong `docs/ARCHITECTURE.md`.
+- [x] Rà lại `docs/ROADMAP.md` và trạng thái Phase 1.
 - [ ] Tạo tag `v0.1.0-phase0` và đóng milestone Phase 0
 
 #### Definition of Done
-- [ ] Không còn quyết định lớn nào ở trạng thái mơ hồ trước khi vào Phase 1
+- [ ] Chủ dự án review ADR-0005; các lựa chọn chưa chốt có phase kiểm chứng và không chặn việc bắt đầu Phase 1.
 
 ### 6.1 Các phase còn lại
 
@@ -252,7 +244,8 @@ Model thay đổi rất nhanh; app và dataset không được khóa vào một 
 Phase 0
 
 #### Việc cần làm
-- [ ] Interface `AIProvider` + provider Ollama / Gemini / Mock (thêm provider mới không sửa service)
+- [x] Baseline đã có `LLMProvider` protocol, factory chọn provider theo `LLM_PROVIDER`, và provider Ollama / Gemini / Mock.
+- [ ] Đối chiếu/chuẩn hóa tên và contract `AIProvider` theo roadmap; thêm test chứng minh thêm provider không cần sửa service.
 - [ ] Prompt đưa vào `ai/prompts/` có version; personality trong `robot_personality.yaml`
 - [ ] Logging có cấu trúc (timestamp, request, model, provider, latency, response, action, validation, lỗi) — không log dữ liệu nhạy cảm
 - [ ] Dockerfile + docker-compose; Swagger có ví dụ request/response/lỗi
