@@ -3,7 +3,10 @@ title: [Phase 0] 0.5 Chốt Phase 0
 labels: phase-0, docs
 milestone: Phase 0
 ---
-## Việc cần làm
+## Trạng thái
+Tạm hoãn theo chỉ đạo của chủ dự án: thực hành Phase 1 trước, quay lại review ADR và đóng Phase 0 sau.
+
+## Việc cần làm khi quay lại Phase 0
 - [x] Cập nhật `docs/RESEARCH_BACKLOG.md`: R1–R9 hoàn tất desk research; R10 giữ OPEN cho Phase 8. Benchmark/kiểm tra thiết bị được ghi ở phase tương ứng.
 - [ ] Chủ dự án review ADR-0005 Proposed và quyết định Accepted/Rejected.
 - [x] Cập nhật mục "Trạng thái các thành phần" trong `docs/ARCHITECTURE.md`.

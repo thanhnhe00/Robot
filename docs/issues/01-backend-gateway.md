@@ -10,12 +10,13 @@ Nâng baseline thành AI Gateway: đổi model chỉ bằng cấu hình (`AIProv
 Model thay đổi rất nhanh; app và dataset không được khóa vào một model.
 
 ## Phụ thuộc
-Phase 0
+Phase 0 đã có thiết kế/research trong repo; theo hướng thực hành đã thống nhất, có thể làm Phase 1 trước và quay lại đóng Phase 0 sau.
 
 ## Việc cần làm
 - [x] Baseline đã có `LLMProvider` protocol, factory chọn provider theo `LLM_PROVIDER`, và provider Ollama / Gemini / Mock.
 - [ ] Đối chiếu/chuẩn hóa tên và contract `AIProvider` theo roadmap; thêm test chứng minh thêm provider không cần sửa service.
-- [ ] Prompt đưa vào `ai/prompts/` có version; personality trong `robot_personality.yaml`
+- [x] Prompt được tách ra `ai/prompts/v1/system.md`, chọn phiên bản bằng `PROMPT_VERSION`.
+- [ ] Tách personality vào `robot_personality.yaml`.
 - [ ] Logging có cấu trúc (timestamp, request, model, provider, latency, response, action, validation, lỗi) — không log dữ liệu nhạy cảm
 - [ ] Dockerfile + docker-compose; Swagger có ví dụ request/response/lỗi
 - [ ] CI GitHub Actions: lint, unit test, API test, docker build

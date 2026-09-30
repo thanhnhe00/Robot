@@ -8,7 +8,7 @@ Ngôn ngữ tài liệu: tiếng Việt. Định danh trong code (tên biến, h
 ## 0. Prompt khởi động (dán vào agent)
 
 > Bạn là kỹ sư phần mềm/AI/robotics làm việc trong repo `Robot`. Lấy nội dung repo này làm nguồn sự thật về trạng thái dự án. Đọc toàn bộ `docs/HANDOFF.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`, `docs/RESEARCH_BACKLOG.md` và `docs/decisions/`.
-> Tuân thủ mục 2 (Quy tắc bất biến). Chỉ làm **một issue mỗi lần**, tiếp tục các issue Phase 0 đang mở. Backend baseline đã có; không dựng lại từ đầu. Hoàn tất Phase 0 trước khi mở rộng triển khai Phase 1.
+> Tuân thủ mục 2 (Quy tắc bất biến). Chỉ làm **một issue mỗi lần**. Theo chỉ đạo hiện tại, ưu tiên thực hành Phase 1; tạm hoãn việc review/đóng Phase 0 cho đến khi người dùng quay lại. Backend baseline đã có; không dựng lại từ đầu.
 > Với mỗi issue: tóm tắt kế hoạch trước, chờ xác nhận, làm, chạy test, rồi báo kết quả (đã làm gì, bằng chứng, việc còn lại, điều chưa chắc). Không tự đổi kiến trúc: nếu phát hiện vấn đề thì dừng, giải thích, đưa phương án và trade-off.
 
 ---
@@ -154,9 +154,9 @@ Mốc gợi ý: **dừng sau Phase 7** vẫn là project đủ mạnh để xin 
 
 Mỗi phase, khi bắt đầu, phải trình đủ 16 mục: mục tiêu, lý do, input, output, kiến trúc, công nghệ, cấu trúc thư mục, luồng dữ liệu, kế hoạch triển khai, code, test, benchmark (nếu phù hợp), security, safety, troubleshooting, Definition of Done. Các issue bên dưới là khung sườn, sẽ tách thành issue con khi tới phase.
 
-### 6.0 Phase 0 – Architecture + Research (đang hoàn thiện)
+### 6.0 Phase 0 – Architecture + Research (tạm hoãn theo chỉ đạo)
 
-**Trạng thái đối chiếu repo:** Phase 0 chưa đóng. Nghiên cứu tài liệu R1–R9 đã được bổ sung trong `docs/research/`; các quyết định về model/runtime và các kiểm tra phụ thuộc thiết bị vẫn là ứng viên/việc cần benchmark, không phải kết quả đã xác nhận trên LG G8. Phase 1 có backend baseline; các hạng mục DoD trong issue `01-backend-gateway.md` vẫn đang mở.
+**Trạng thái:** tài liệu nghiên cứu R1–R9 đã có trong `docs/research/`, nhưng issue đóng Phase 0 và review ADR-0005 được hoãn để người dùng thực hành trước. Theo chỉ đạo hiện tại, bắt đầu Phase 1 dù Phase 0 chưa đóng chính thức. Các benchmark phụ thuộc thiết bị vẫn để cho phase tương ứng.
 
 ### [Phase 0] 0.1 Đồng bộ baseline và dựng khung tài liệu
 
@@ -234,6 +234,8 @@ Trả lời R8–R9; đủ thông tin để chọn framework Android và định
 
 ### [Phase 1] Backend AI Gateway + Model abstraction
 
+**Đang thực hiện:** prompt đã chuyển sang `ai/prompts/v1/system.md`, chọn phiên bản qua `PROMPT_VERSION` (mặc định `v1`). Lát cắt tiếp theo là tách personality thành cấu hình riêng.
+
 #### Mục tiêu
 Nâng baseline thành AI Gateway: đổi model chỉ bằng cấu hình (`AIProvider`: Local/Laptop/Cloud/Mock, ví dụ Ollama, llama.cpp, Gemini), prompt versioned, personality tách khỏi model.
 
@@ -241,12 +243,13 @@ Nâng baseline thành AI Gateway: đổi model chỉ bằng cấu hình (`AIProv
 Model thay đổi rất nhanh; app và dataset không được khóa vào một model.
 
 #### Phụ thuộc
-Phase 0
+Phase 0 (tạm hoãn theo chỉ đạo hiện tại)
 
 #### Việc cần làm
 - [x] Baseline đã có `LLMProvider` protocol, factory chọn provider theo `LLM_PROVIDER`, và provider Ollama / Gemini / Mock.
 - [ ] Đối chiếu/chuẩn hóa tên và contract `AIProvider` theo roadmap; thêm test chứng minh thêm provider không cần sửa service.
-- [ ] Prompt đưa vào `ai/prompts/` có version; personality trong `robot_personality.yaml`
+- [x] Prompt versioned trong `ai/prompts/v1/system.md`, chọn bằng `PROMPT_VERSION`.
+- [ ] Tách personality vào `robot_personality.yaml`.
 - [ ] Logging có cấu trúc (timestamp, request, model, provider, latency, response, action, validation, lỗi) — không log dữ liệu nhạy cảm
 - [ ] Dockerfile + docker-compose; Swagger có ví dụ request/response/lỗi
 - [ ] CI GitHub Actions: lint, unit test, API test, docker build
@@ -617,8 +620,8 @@ Mỗi phase có test; Phase 13 tổng hợp end-to-end và reliability.
 
 ### 8.1 Làm ngay (thứ tự)
 1. Đẩy repo lên GitHub (public), chạy `python scripts/create_issues.py --dry-run` rồi chạy thật (cần `gh auth login`).
-2. Làm lần lượt issue 0.2 (nhóm A: LLM) → 0.3 (nhóm B: voice) → 0.4 (nhóm C: Android + phần cứng) → 0.5 (chốt Phase 0, tag `v0.1.0-phase0`).
-3. Sau Phase 0: Phase 1 (nâng cấp backend).
+2. Hiện tại thực hành issue Phase 1 `01-backend-gateway.md`; prompt versioning đã bắt đầu.
+3. Quay lại issue 0.5 để review ADR-0005 và đóng Phase 0 sau giai đoạn thực hành.
 
 ### 8.2 Môi trường trên laptop (Windows/Linux)
 | Công cụ | Khi nào cần | Ghi chú |
@@ -627,7 +630,7 @@ Mỗi phase có test; Phase 13 tổng hợp end-to-end và reliability.
 | Python 3.11+ | Ngay | Backend đã chạy test trên Python 3.12 |
 | Git + GitHub CLI (`gh`) | Ngay | `gh auth login` |
 | Ollama + model nhỏ (vd `qwen3:1.7b`) | Khi test provider Ollama | Kiểm tra tên model hiện hành trên thư viện Ollama |
-| Docker Desktop | Phase 1 | |
+| Docker Desktop | Phần Docker của Phase 1 | |
 | Android Studio + NDK + CMake | Phase 3 (NDK: Phase 4) | |
 | `adb` + `scrcpy` | Phase 3 | Điều khiển/debug G8 từ laptop |
 | PlatformIO (hoặc ESP-IDF) | Phase 9 | Chốt bằng ADR |

@@ -6,8 +6,8 @@ Thay đổi so với bản gốc:
 
 | Phase | Nội dung | Definition of Done (tóm tắt) | Phần cứng |
 |---|---|---|---|
-| 0 | Architecture + Research | Research R1–R9 có nguồn, ứng viên và giới hạn được ghi rõ; ADR cần thiết được rà soát; issue Phase 0 đóng theo DoD | G8, laptop |
-| 1 | Backend AI Gateway **+ Model abstraction** | `AIProvider` (đổi model bằng cấu hình), prompt versioned, personality yaml, Docker, CI, Swagger | laptop |
+| 0 | Architecture + Research | Tạm để mở; quay lại review ADR-0005 và đóng các mục Phase 0 sau giai đoạn thực hành | G8, laptop |
+| 1 | Backend AI Gateway **+ Model abstraction** | Provider đổi bằng cấu hình, prompt versioned, personality yaml, Docker, CI, Swagger | laptop |
 | 2 | Agent + Action System **+ Evaluation v0** | Action registry, JSON Schema chung, safety pipeline, test an toàn, eval harness, **golden test set** | laptop |
 | 3 | Android app | UI + state machine, Action Executor, `AIProvider` phía Android, nhập text | G8 |
 | 4 | Spike LLM trên G8 **+ Model Manager v0** | `LocalProvider`, benchmark đủ metric, go/no-go | G8 |
@@ -33,6 +33,6 @@ Thay đổi so với bản gốc:
 | Test / Reliability | Unit → API → Agent/Action → Android → ESP32 → E2E → crash/reconnect | Phase 1 |
 | RAG | Chỉ làm nếu benchmark chứng minh cần (Phase 6) | Phase 6 |
 
-Quy tắc: xong phase trước, báo kết quả, mới sang phase sau. Docker và CI tối thiểu bắt đầu từ Phase 1.
+Quy tắc thông thường: xong phase trước rồi mới sang phase sau. Ngoại lệ hiện tại: theo chỉ đạo của chủ dự án, thực hành Phase 1 trước và quay lại đóng Phase 0 sau.
 
-Trạng thái tại 2026-09-30: Phase 0 chưa đóng; backend baseline đã có. Benchmark LLM/voice trên G8 và kiểm tra USB phụ thuộc thiết bị được thực hiện ở các phase tương ứng, không được coi là đã xong chỉ từ nghiên cứu tài liệu.
+Trạng thái tại 2026-09-30: Phase 1 đang được thực hành trước theo chỉ đạo của chủ dự án; Phase 0 research có sẵn nhưng phần review/đóng phase được hoãn. Backend baseline đã có. Benchmark LLM/voice trên G8 và kiểm tra USB phụ thuộc thiết bị được thực hiện ở các phase tương ứng.
