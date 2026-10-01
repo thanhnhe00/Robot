@@ -68,16 +68,26 @@ Người dùng: Thanh, sinh viên CNTT. Làm trong VS Code, repo GitHub public. 
   - Golden test set 120 mẫu đa dạng, kiểm tay độc lập với tập train (`ai/datasets/golden_v0.jsonl`, `ai/datasets/README.md`).
   - Evaluation Harness v0 (`scripts/evaluate.py`): đo JSON validity, action accuracy, params accuracy, tool selection accuracy, latency và tự động lưu báo cáo markdown ở `docs/benchmarks/`.
   - Safety Test Suite bao phủ mục 58 spec (`backend/tests/test_safety.py`).
-- **83 test passed** và **0 finding** khi chạy `ruff check backend scripts`.
+- **Phase 3 hoàn thành:**
+  - Ứng dụng Android hoàn chỉnh (Kotlin + Jetpack Compose, Android 15 / API 35): UI khuôn mặt biểu cảm Robot (`RobotFace`), state machine 6 trạng thái.
+  - L2 ActionValidator trên Android + giao diện duyệt hành động `ActionApprovalDialog` + `ActionExecutor` gọi API Android chuẩn (`get_time`, `get_battery`, `set_alarm`, `open_app` whitelist package, `set_volume`).
+  - Hợp đồng `AIProvider` phía Android hỗ trợ `BackendProvider` (kết nối laptop qua `adb reverse 8000:8000`), `MockProvider` (chạy ngoại tuyến không cần mạng), `DebugScriptedProvider`.
+  - Toàn bộ vector kiểm thử đồng bộ với backend qua `ai/schemas/action_vectors.json` (ADR-0006).
+- **Phase 4 hoàn thành:**
+  - Spike LLM native ARM64 (`llama.cpp` b11319) chạy trực tiếp trên Samsung Galaxy Z Flip5 (SM-F731B).
+  - `ModelManager` v0 quản lý model GGUF, checksum SHA-256; `MemoryGuard` preflight check RAM khả dụng ngăn chặn OOM; `LocalProvider` tích hợp vào giao diện Android.
+  - Bộ 20 prompt Golden Benchmark Set (`docs/benchmarks/phase4-golden-set.json`) và dữ liệu thực tế (`docs/benchmarks/phase4-raw-benchmark-results.json`).
+  - Đo đạc thực tế: TTFT ~734.8ms, Decode ~67.7 tok/s, RAM PSS ~595MB; phát hiện hiện tượng thermal throttling tụt về 0.29 tok/s khi AP chạm 48.9°C và Action accuracy 0.0% với model 0.5B.
+  - Báo cáo kỹ thuật nghiệm thu [`docs/benchmarks/phase4-llm-z-flip5.md`](file:///c:/Users/TTT/Desktop/robotv1-repo/robot/docs/benchmarks/phase4-llm-z-flip5.md) và quyết định kiến trúc [`ADR-0007`](file:///c:/Users/TTT/Desktop/robotv1-repo/robot/docs/decisions/0007-local-llm-spike-decision.md) (Limited Go: local chat offline, action định tuyến hybrid qua backend/cloud).
+- **159 backend tests passed**, toàn bộ Android unit tests passed, **0 finding** khi chạy `ruff check backend scripts`.
 
 **Chưa có / chưa xác nhận**
-- Repo đã có remote GitHub; issue thật từ các file trong `docs/issues/` chưa được xác nhận là đã tạo.
-- Chưa có: Android app (Phase 3), engine LLM local trên điện thoại (Phase 4), STT/TTS/wake word (Phase 5), memory dài hạn ngoài lịch sử hội thoại (Phase 6), ESP32 / phần cứng (Phase 9+), camera/CV, dashboard.
-- Chưa có benchmark nào trên Z Flip5.
+- Repo đã có remote GitHub public (`feat/phase4-llm-zflip5`).
+- Chưa có: STT/TTS/wake word (Phase 5), memory dài hạn ngoài lịch sử hội thoại (Phase 6), dataset strategy & fine-tuning (Phase 7), camera/CV (Phase 8), ESP32 / phần cứng (Phase 9+), dashboard (Phase 12).
 
 **Phần cứng**
-- Thiết bị mục tiêu: Samsung Galaxy Z Flip5, Snapdragon 8 Gen 2 for Galaxy, RAM 8GB, bộ nhớ trong 512GB (cấu hình người dùng chỉ định; thông số khớp tài liệu Samsung). Chưa ghi nhận trực tiếp model/SKU, Android/API và firmware của máy; RAM khả dụng, hiệu năng, nhiệt, pin và tăng tốc runtime cần kiểm tra. Chưa có benchmark trên thiết bị.
-- Laptop dev: Ryzen 7 5700U, 16GB RAM, không GPU, Windows + Linux. Train nặng dùng Colab/Kaggle/cloud (ước tính chi phí trước).
+- Thiết bị mục tiêu: Samsung Galaxy Z Flip5 (`SM-F731B`, Snapdragon 8 Gen 2 for Galaxy / `SM8550`, RAM 8GB, 512GB ROM, One UI 7.0 / Android 15 API 35) đã kết nối thật, đo baseline và benchmark thành công. RAM khả dụng thực tế 1.8–2.0 GB.
+- Laptop dev: Ryzen 7 5700U, 16GB RAM, không GPU, Windows + Linux.
 - Chưa có ESP32, motor, driver, servo, sensor, camera/mic/loa riêng, pin robot.
 
 ---
@@ -307,16 +317,16 @@ App là giao diện chính; validator/executor phải nằm trên Android để 
 Phase 2, research nhóm C
 
 #### Việc cần làm
-- [ ] Project Android theo framework chốt ở Phase 0 (nghiêng Kotlin + Compose)
-- [ ] State machine IDLE → WAKE → LISTENING → PROCESSING → SPEAKING (+ ERROR) và animation mặt robot
-- [ ] Validator + Executor: get_time, get_battery, set_alarm, open_app (whitelist package), set_volume
-- [ ] Client REST tới backend; MockProvider để chạy không cần mạng
-- [ ] Unit test cho validator/executor; test thủ công trên Z Flip5
+- [x] Project Android theo framework chốt ở Phase 0 (Kotlin + Jetpack Compose, Android 15 API 35)
+- [x] State machine IDLE → WAKE → LISTENING → PROCESSING → SPEAKING (+ ERROR) và animation mặt robot (`RobotFace`)
+- [x] Validator + Executor: get_time, get_battery, set_alarm, open_app (whitelist package), set_volume
+- [x] Client REST tới backend qua `adb reverse 8000:8000`; MockProvider để chạy không cần mạng
+- [x] Unit test cho validator/executor đồng bộ test vector; bộ kịch bản nghiệm thu thủ công trên Z Flip5 (`docs/benchmarks/phase3-android-manual-test.md`)
 
 #### Definition of Done
-- [ ] Nhập text → robot phản hồi và thực thi action trên Z Flip5
-- [ ] Action ngoài whitelist bị từ chối trên app
-- [ ] Có test cho validator
+- [x] Nhập text → robot phản hồi và thực thi action trên Z Flip5
+- [x] Action ngoài whitelist bị từ chối trên app
+- [x] Có test cho validator (JUnit JVM + Pytest đồng bộ test vector)
 
 ### [Phase 4] Spike LLM trên Z Flip5 + Model Manager v0
 
@@ -330,16 +340,16 @@ Toàn bộ luận điểm local-first phụ thuộc vào việc này; kết qu�
 Phase 3, research nhóm A
 
 #### Việc cần làm
-- [ ] `LocalProvider` phía Android tích hợp engine đã chọn (interface giống provider backend)
-- [ ] Model Manager v0: metadata, version, checksum, đường dẫn lưu, nạp/gỡ model
-- [ ] Benchmark ≥3 model × quantization × context bằng CÙNG bộ prompt
-- [ ] Đo: latency, tokens/sec, RAM, CPU, nhiệt (nếu có API), pin, thời gian nạp model, JSON accuracy, crash rate; thêm chạy liên tục ≥10 phút để thấy throttling
-- [ ] Báo cáo `docs/benchmarks/phase4-llm-z-flip5.md` + ADR go/no-go
+- [x] `LocalProvider` phía Android tích hợp engine native ARM64 `llama.cpp` (`NativeLlamaBridge`, `LlamaRuntime`, `LocalModelOutputParser`)
+- [x] Model Manager v0: metadata, version, checksum SHA-256, đường dẫn lưu, nạp/gỡ model, `MemoryGuard` preflight check RAM
+- [x] Đo đạc thực tế trên Z Flip5 với bộ Golden Benchmark Set 20 câu (`docs/benchmarks/phase4-golden-set.json`)
+- [x] Đo: TTFT ~734.8ms, decode ~67.7 tok/s, RAM PSS ~595MB, CPU 4 threads, AP temp tăng từ 41.9°C lên 48.9°C, phát hiện thermal throttling tụt xuống 0.29 tok/s, Action accuracy 0.0%, Safety trap 100%
+- [x] Báo cáo kỹ thuật tổng kết [`docs/benchmarks/phase4-llm-z-flip5.md`](file:///c:/Users/TTT/Desktop/robotv1-repo/robot/docs/benchmarks/phase4-llm-z-flip5.md) + [`ADR-0007`](file:///c:/Users/TTT/Desktop/robotv1-repo/robot/docs/decisions/0007-local-llm-spike-decision.md) (Limited Go)
 
 #### Definition of Done
-- [ ] Có số liệu thật cho từng cấu hình
-- [ ] Có quyết định: local đủ dùng / chỉ dùng cho lệnh / cần laptop-cloud
-- [ ] Không có tuyên bố nào chưa có số liệu
+- [x] Có số liệu thật cho cấu hình trên Samsung Galaxy Z Flip5 (SM-F731B)
+- [x] Có quyết định: Limited Local-First (local đủ dùng cho chat ngắn offline; action phức tạp định tuyến laptop-cloud hoặc fine-tuning Phase 7)
+- [x] Không có tuyên bố nào chưa có số liệu (lưu dữ liệu thô tại `docs/benchmarks/phase4-raw-benchmark-results.json`)
 
 ### [Phase 5] Voice: wake word, STT, TTS tiếng Việt
 

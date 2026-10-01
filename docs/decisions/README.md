@@ -21,3 +21,4 @@ Chosen:
 | 0004 | Bổ sung 6 hạng mục xuyên suốt vào roadmap | Accepted |
 | 0005 | Phase 0 research shortlists và các lựa chọn phụ thuộc thiết bị | Proposed |
 | 0006 | Android Kotlin + Jetpack Compose và cơ chế đồng bộ hợp đồng | Accepted |
+| 0007 | Kết quả Spike LLM Local trên Galaxy Z Flip5 và Định hướng Quyết định (Limited Go) | Accepted |

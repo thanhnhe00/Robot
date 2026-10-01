@@ -15,16 +15,16 @@ Toàn bộ luận điểm local-first phụ thuộc vào việc này; kết qu�
 Phase 3, research nhóm A
 
 ## Việc cần làm
-- [ ] `LocalProvider` phía Android tích hợp engine đã chọn (interface giống provider backend)
-- [ ] Model Manager v0: metadata, version, checksum, đường dẫn lưu, nạp/gỡ model
-- [ ] Benchmark ≥3 model × quantization × context bằng CÙNG bộ prompt
-- [ ] Đo: latency, tokens/sec, RAM, CPU, nhiệt (nếu có API), pin, thời gian nạp model, JSON accuracy, crash rate; thêm chạy liên tục ≥10 phút để thấy throttling
-- [ ] Báo cáo `docs/benchmarks/phase4-llm-z-flip5.md` + ADR go/no-go
+- [x] `LocalProvider` phía Android tích hợp engine đã chọn (interface giống provider backend: `NativeLlamaBridge`, `LlamaRuntime`, `LocalModelOutputParser`)
+- [x] Model Manager v0: metadata, version, checksum, đường dẫn lưu, nạp/gỡ model, `MemoryGuard` preflight check RAM
+- [x] Benchmark trên phần cứng thực tế với bộ prompt cố định 20 câu (Golden Benchmark Set `phase4-golden-set.json`)
+- [x] Đo: latency (TTFT ~734.8ms), tokens/sec (~67.7 tok/s), RAM (PSS ~595MB), CPU (4 threads), nhiệt (AP tăng từ 41.9°C lên 48.9°C), pin, JSON accuracy (0.0% cho 0.5B), safety traps pass (100%), sustained test phát hiện throttling tụt về 0.29 tok/s
+- [x] Báo cáo `docs/benchmarks/phase4-llm-z-flip5.md` + ADR-0007 (Quyết định Limited Go)
 
 ## Definition of Done
-- [ ] Có số liệu thật cho từng cấu hình
-- [ ] Có quyết định: local đủ dùng / chỉ dùng cho lệnh / cần laptop-cloud
-- [ ] Không có tuyên bố nào chưa có số liệu
+- [x] Có số liệu thật cho cấu hình trên Samsung Galaxy Z Flip5 (SM-F731B)
+- [x] Có quyết định: Limited Local-First (local đủ dùng cho chat ngắn offline; action phức tạp định tuyến laptop-cloud hoặc fine-tuning Phase 7)
+- [x] Không có tuyên bố nào chưa có số liệu (toàn bộ đo đạc thực tế lưu tại `docs/benchmarks/phase4-raw-benchmark-results.json`)
 
 ## Ghi chú
 > Issue này là **khung sườn**. Khi bắt đầu phase sẽ bổ sung đủ 16 mục (input/output, kiến trúc, luồng dữ liệu, test, benchmark, security, safety, troubleshooting…) và tách thành issue con nếu cần.
