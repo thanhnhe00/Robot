@@ -1,0 +1,3 @@
+# Normalize line endings — LF everywhere
+# Giải quyết lệch CRLF/LF giữa máy Windows và repo
+* text=auto eol=lf

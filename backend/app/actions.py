@@ -5,42 +5,49 @@ Action có hardware=STUB bị từ chối khi validate (chưa nối phần cứn
 """
 
 import json
+import logging
 import re
 from typing import Any
 
 from .action_registry import REGISTRY, HardwareStatus
 from .schemas import Action, ChatResponse
 
+log = logging.getLogger("robot")
+
 THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL)
 
 
-def validate_action(raw: Any) -> Action | None:
-    """Validate action do model đề xuất. Trả None nếu bất kỳ bước nào fail.
+def validate_action(raw: Any) -> tuple[Action | None, str]:
+    """Validate action do model đề xuất.
 
-    Luồng: action type trong registry? → hardware READY? → params hợp lệ? → OK.
+    Returns:
+        (Action, "ok") nếu hợp lệ.
+        (None, lý_do) nếu bất kỳ bước nào fail.
+    Lý do luôn là chuỗi ngắn gọn để ghi log, không chứa dữ liệu nhạy cảm.
     """
     if not isinstance(raw, dict):
-        return None
+        return None, "not_dict"
     action_type = str(raw.get("type", "")).strip()
 
     # Action ngoài registry → từ chối
     spec = REGISTRY.get(action_type)
     if spec is None:
-        return None
+        return None, f"unknown_type:{action_type or '(empty)'}"
 
     # Action chưa nối phần cứng → từ chối
     if spec.hardware != HardwareStatus.READY:
-        return None
+        return None, f"hardware_stub:{action_type}"
 
-    params = raw.get("params") or {}
-    if not isinstance(params, dict):
-        return None
+    raw_params = raw.get("params")
+    if raw_params is not None and not isinstance(raw_params, dict):
+        return None, f"params_not_dict:{action_type}"
+    params = raw_params or {}
 
     clean = spec.validate_params(params)
     if clean is None:
-        return None
+        return None, f"invalid_params:{action_type}"
 
-    return Action(type=action_type, params=clean)
+    return Action(type=action_type, params=clean), "ok"
 
 
 def parse_model_output(text: str) -> ChatResponse:
@@ -55,7 +62,26 @@ def parse_model_output(text: str) -> ChatResponse:
         raise ValueError(f"JSON không hợp lệ: {e}") from e
     if not isinstance(data, dict):
         raise ValueError("JSON gốc phải là object")  # noqa: TRY004  # service bắt ValueError để retry
+
+    raw_action = data.get("action")
+    if raw_action is None:
+        action = None
+        action_rejection = None
+    else:
+        action, reason = validate_action(raw_action)
+        action_rejection = reason if action is None else None
+        if action is None:
+            log.warning(
+                "action.rejected",
+                extra={
+                    "event": "action.rejected",
+                    "proposed_action": raw_action,
+                    "reason": reason,
+                },
+            )
+
     return ChatResponse(
         response=str(data.get("response", "")).strip(),
-        action=validate_action(data.get("action")),
+        action=action,
+        action_rejection=action_rejection,
     )

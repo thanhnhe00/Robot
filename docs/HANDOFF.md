@@ -115,24 +115,24 @@ Ràng buộc offline: wake word, STT/TTS local, LLM local, memory local, Android
 ## 5. Công nghệ
 
 **Đã chốt**
-| Thành phần | Lựa chọn |
-|---|---|
-| Backend | FastAPI + Python |
-| Database prototype | SQLite (PostgreSQL sau nếu cần) |
-| Repo | Monorepo, GitHub public |
-| CI/CD | GitHub Actions (bắt đầu Phase 1) |
-| Editor | VS Code |
+| Thành phần         | Lựa chọn                         |
+| ------------------ | -------------------------------- |
+| Backend            | FastAPI + Python                 |
+| Database prototype | SQLite (PostgreSQL sau nếu cần)  |
+| Repo               | Monorepo, GitHub public          |
+| CI/CD              | GitHub Actions (bắt đầu Phase 1) |
+| Editor             | VS Code                          |
 
 **Chưa chốt (cần research/benchmark, KHÔNG được coi là quyết định)**
-| Thành phần | Ứng viên | Ghi chú |
-|---|---|---|
-| Framework Android | Kotlin (nghiêng), Flutter | Nghiêng Kotlin vì cần JNI/NDK, audio, service; chốt bằng ADR sau research nhóm C |
-| Engine LLM local | llama.cpp (ứng viên đầu, tự build bằng NDK), MLC, ONNX Runtime GenAI, MediaPipe/LiteRT-LM, ExecuTorch | Research nhóm A |
-| Model | Qwen3 0.6B / 1.7B (ứng viên đầu), 1–2 model nhỏ khác | Benchmark trên Z Flip5; quantization Q4_K_M/Q5_K_M/Q6_K/Q8_0 |
-| STT / TTS / wake word tiếng Việt | Android SpeechRecognizer, sherpa-onnx, whisper.cpp, cloud; Piper; openWakeWord, Porcupine | Research nhóm B |
-| Phone ↔ ESP32 | USB (nghiêng), BLE, WiFi | Chốt ở Phase 9. Lưu ý USB: phone gắn trên robot nên cáp ngắn; rủi ro là sạc + OTG cùng lúc, rung |
-| Vision | MediaPipe, TFLite, họ YOLO | Kiểm tra license (một số bản là AGPL); Phase 8 |
-| RAG / vector DB | — | **Chỉ làm nếu benchmark chứng minh cần** (Phase 6) |
+| Thành phần                       | Ứng viên                                                                                              | Ghi chú                                                                                          |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Framework Android                | Kotlin (nghiêng), Flutter                                                                             | Nghiêng Kotlin vì cần JNI/NDK, audio, service; chốt bằng ADR sau research nhóm C                 |
+| Engine LLM local                 | llama.cpp (ứng viên đầu, tự build bằng NDK), MLC, ONNX Runtime GenAI, MediaPipe/LiteRT-LM, ExecuTorch | Research nhóm A                                                                                  |
+| Model                            | Qwen3 0.6B / 1.7B (ứng viên đầu), 1–2 model nhỏ khác                                                  | Benchmark trên Z Flip5; quantization Q4_K_M/Q5_K_M/Q6_K/Q8_0                                     |
+| STT / TTS / wake word tiếng Việt | Android SpeechRecognizer, sherpa-onnx, whisper.cpp, cloud; Piper; openWakeWord, Porcupine             | Research nhóm B                                                                                  |
+| Phone ↔ ESP32                    | USB (nghiêng), BLE, WiFi                                                                              | Chốt ở Phase 9. Lưu ý USB: phone gắn trên robot nên cáp ngắn; rủi ro là sạc + OTG cùng lúc, rung |
+| Vision                           | MediaPipe, TFLite, họ YOLO                                                                            | Kiểm tra license (một số bản là AGPL); Phase 8                                                   |
+| RAG / vector DB                  | —                                                                                                     | **Chỉ làm nếu benchmark chứng minh cần** (Phase 6)                                               |
 
 ---
 
@@ -140,23 +140,23 @@ Ràng buộc offline: wake word, STT/TTS local, LLM local, memory local, Android
 
 Thứ tự đã duyệt (ADR-0002, ADR-0004): spike LLM trên Z Flip5 (Phase 4) đặt **trước** Voice (Phase 5). Quy tắc: xong phase trước, báo kết quả, mới sang phase sau.
 
-| Phase | Nội dung | Phần cứng |
-|---|---|---|
-| 0 | Architecture + Research | Z Flip5, laptop |
-| 1 | Backend AI Gateway + Model abstraction | laptop |
-| 2 | Agent + Action System + Evaluation v0 | laptop |
-| 3 | Android app | Z Flip5 |
-| 4 | Spike LLM trên Z Flip5 + Model Manager v0 | Z Flip5 |
-| 5 | Voice | Z Flip5 |
-| 6 | Memory + Tools + AI Router + RAG gate | Z Flip5 |
-| 7 | Dataset strategy + Fine-tuning | Colab/Kaggle |
-| 8 | Camera + Computer Vision | camera Z Flip5 |
-| 9 | ESP32 + liên kết phone↔ESP32 | ESP32 |
-| 10 | Motor + Safety | motor, driver, pin |
-| 11 | Navigation | sensor |
-| 12 | Dashboard + DevOps + Model update | – |
-| 13 | Tích hợp cuối + E2E + Reliability | tất cả |
-| 14 | Portfolio, tài liệu, demo | – |
+| Phase | Nội dung                                  | Phần cứng          |
+| ----- | ----------------------------------------- | ------------------ |
+| 0     | Architecture + Research                   | Z Flip5, laptop    |
+| 1     | Backend AI Gateway + Model abstraction    | laptop             |
+| 2     | Agent + Action System + Evaluation v0     | laptop             |
+| 3     | Android app                               | Z Flip5            |
+| 4     | Spike LLM trên Z Flip5 + Model Manager v0 | Z Flip5            |
+| 5     | Voice                                     | Z Flip5            |
+| 6     | Memory + Tools + AI Router + RAG gate     | Z Flip5            |
+| 7     | Dataset strategy + Fine-tuning            | Colab/Kaggle       |
+| 8     | Camera + Computer Vision                  | camera Z Flip5     |
+| 9     | ESP32 + liên kết phone↔ESP32              | ESP32              |
+| 10    | Motor + Safety                            | motor, driver, pin |
+| 11    | Navigation                                | sensor             |
+| 12    | Dashboard + DevOps + Model update         | –                  |
+| 13    | Tích hợp cuối + E2E + Reliability         | tất cả             |
+| 14    | Portfolio, tài liệu, demo                 | –                  |
 
 Mốc gợi ý: **dừng sau Phase 7** vẫn là project đủ mạnh để xin việc (app + backend + model riêng + số liệu). Phase 8 trở đi là phần robot vật lý.
 
@@ -605,17 +605,17 @@ Action accuracy • JSON validity • Intent accuracy • Tool selection accurac
 Mỗi phase có test; Phase 13 tổng hợp end-to-end và reliability.
 
 #### Loại test và phase bắt đầu
-| Loại | Bắt đầu |
-|---|---|
-| Unit test | Phase 1 |
-| API test / Integration test | Phase 1 |
-| Agent/Action test (mục 58) | Phase 2 |
-| Android test | Phase 3 |
-| Model/Eval test | Phase 2, mở rộng Phase 4 |
-| ESP32 communication test | Phase 9 |
-| Safety test phần cứng (e-stop, mất link, vật cản) | Phase 10 |
-| End-to-End | Phase 13 |
-| Crash/reconnect/soak | Phase 9 (link), Phase 13 (toàn hệ thống) |
+| Loại                                              | Bắt đầu                                  |
+| ------------------------------------------------- | ---------------------------------------- |
+| Unit test                                         | Phase 1                                  |
+| API test / Integration test                       | Phase 1                                  |
+| Agent/Action test (mục 58)                        | Phase 2                                  |
+| Android test                                      | Phase 3                                  |
+| Model/Eval test                                   | Phase 2, mở rộng Phase 4                 |
+| ESP32 communication test                          | Phase 9                                  |
+| Safety test phần cứng (e-stop, mất link, vật cản) | Phase 10                                 |
+| End-to-End                                        | Phase 13                                 |
+| Crash/reconnect/soak                              | Phase 9 (link), Phase 13 (toàn hệ thống) |
 
 #### Việc cần làm
 - [ ] Quy ước cấu trúc test (`backend/tests`, `tests/` cho tích hợp, test Android)
@@ -634,16 +634,16 @@ Mỗi phase có test; Phase 13 tổng hợp end-to-end và reliability.
 3. Quay lại issue 0.5 để review ADR-0005 và đóng Phase 0 sau giai đoạn thực hành.
 
 ### 8.2 Môi trường trên laptop (Windows/Linux)
-| Công cụ | Khi nào cần | Ghi chú |
-|---|---|---|
-| VS Code + extension (Python, Pylance, Ruff, GitHub PR, Markdown, EditorConfig) | Ngay | Đã có `.vscode/extensions.json` |
-| Python 3.11+ | Ngay | Backend đã chạy test trên Python 3.12 |
-| Git + GitHub CLI (`gh`) | Ngay | `gh auth login` |
-| Ollama + model nhỏ (vd `qwen3:1.7b`) | Khi test provider Ollama | Kiểm tra tên model hiện hành trên thư viện Ollama |
-| Docker Desktop | Phần Docker của Phase 1 | |
-| Android Studio + NDK + CMake | Phase 3 (NDK: Phase 4) | |
-| `adb` + `scrcpy` | Phase 3 | Điều khiển/debug Z Flip5 từ laptop |
-| PlatformIO (hoặc ESP-IDF) | Phase 9 | Chốt bằng ADR |
+| Công cụ                                                                        | Khi nào cần              | Ghi chú                                           |
+| ------------------------------------------------------------------------------ | ------------------------ | ------------------------------------------------- |
+| VS Code + extension (Python, Pylance, Ruff, GitHub PR, Markdown, EditorConfig) | Ngay                     | Đã có `.vscode/extensions.json`                   |
+| Python 3.11+                                                                   | Ngay                     | Backend đã chạy test trên Python 3.12             |
+| Git + GitHub CLI (`gh`)                                                        | Ngay                     | `gh auth login`                                   |
+| Ollama + model nhỏ (vd `qwen3:1.7b`)                                           | Khi test provider Ollama | Kiểm tra tên model hiện hành trên thư viện Ollama |
+| Docker Desktop                                                                 | Phần Docker của Phase 1  |                                                   |
+| Android Studio + NDK + CMake                                                   | Phase 3 (NDK: Phase 4)   |                                                   |
+| `adb` + `scrcpy`                                                               | Phase 3                  | Điều khiển/debug Z Flip5 từ laptop                |
+| PlatformIO (hoặc ESP-IDF)                                                      | Phase 9                  | Chốt bằng ADR                                     |
 
 ### 8.3 Tài khoản và khóa
 - GitHub (repo public).
@@ -661,12 +661,12 @@ Mỗi phase có test; Phase 13 tổng hợp end-to-end và reliability.
 - Chiến lược dataset train ở Phase 7: có sẵn → synthetic → augmentation → kiểm tay khi thật sự cần (người dùng không muốn nhập tay hàng nghìn mẫu, chấp nhận vài nghìn).
 
 ### 8.6 Phần cứng robot (chưa mua gì; chọn cụ thể cùng nhau khi tới phase)
-| Khi nào | Nhóm linh kiện |
-|---|---|
-| Phase 9 | Board ESP32, cáp USB dữ liệu |
+| Khi nào  | Nhóm linh kiện                                                                                                   |
+| -------- | ---------------------------------------------------------------------------------------------------------------- |
+| Phase 9  | Board ESP32, cáp USB dữ liệu                                                                                     |
 | Phase 10 | Motor + driver + khung robot, pin và mạch nguồn, **nút e-stop vật lý** cắt nguồn/enable motor, giá đỡ điện thoại |
-| Phase 11 | Cảm biến khoảng cách; có thể thêm encoder/IMU |
-| Tùy chọn | Hub USB có cấp nguồn (vừa sạc vừa OTG), mic/loa rời, servo, LED, LiDAR |
+| Phase 11 | Cảm biến khoảng cách; có thể thêm encoder/IMU                                                                    |
+| Tùy chọn | Hub USB có cấp nguồn (vừa sạc vừa OTG), mic/loa rời, servo, LED, LiDAR                                           |
 
 Camera dùng camera của Z Flip5 trước. Không mua phần cứng trước khi phase tương ứng bắt đầu và người dùng đồng ý.
 
@@ -674,31 +674,31 @@ Camera dùng camera của Z Flip5 trước. Không mua phần cứng trước kh
 
 ## 9. Rủi ro chính
 
-| Rủi ro | Giảm thiểu |
-|---|---|
-| Hiệu năng bền vững, RAM khả dụng, nhiệt và pin khi chạy LLM local trên Z Flip5 chưa biết | Đo trong Phase 4; router; intent nhẹ cho lệnh xác định; laptop/cloud fallback |
-| Nóng máy, throttling, hao pin | Benchmark liên tục ≥10 phút; giới hạn thread; nạp model theo nhu cầu |
-| STT/TTS/wake word tiếng Việt local kém | Benchmark từng khối; hybrid với cloud |
-| Hạn chế Android (CẦN KIỂM TRA tài liệu): bật/tắt WiFi bằng code, mic nền cần foreground service | Dùng API chính thức hoặc mở panel cài đặt; thiết kế fallback |
-| LLM bịa action/JSON sai | Schema + whitelist + không execute nếu sai + test an toàn |
-| Mất liên lạc phone↔ESP32 | Watchdog + e-stop vật lý |
-| USB: sạc + OTG cùng lúc, cáp lỏng do rung | Kiểm tra sớm; phương án BLE/WiFi |
-| Nhận diện sai, dữ liệu khuôn mặt | Vision tách khỏi LLM; lưu local, có xóa |
-| Phạm vi quá lớn | Lát cắt dọc, mỗi phase chạy được và có demo; có mốc dừng sau Phase 7 |
+| Rủi ro                                                                                          | Giảm thiểu                                                                    |
+| ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Hiệu năng bền vững, RAM khả dụng, nhiệt và pin khi chạy LLM local trên Z Flip5 chưa biết        | Đo trong Phase 4; router; intent nhẹ cho lệnh xác định; laptop/cloud fallback |
+| Nóng máy, throttling, hao pin                                                                   | Benchmark liên tục ≥10 phút; giới hạn thread; nạp model theo nhu cầu          |
+| STT/TTS/wake word tiếng Việt local kém                                                          | Benchmark từng khối; hybrid với cloud                                         |
+| Hạn chế Android (CẦN KIỂM TRA tài liệu): bật/tắt WiFi bằng code, mic nền cần foreground service | Dùng API chính thức hoặc mở panel cài đặt; thiết kế fallback                  |
+| LLM bịa action/JSON sai                                                                         | Schema + whitelist + không execute nếu sai + test an toàn                     |
+| Mất liên lạc phone↔ESP32                                                                        | Watchdog + e-stop vật lý                                                      |
+| USB: sạc + OTG cùng lúc, cáp lỏng do rung                                                       | Kiểm tra sớm; phương án BLE/WiFi                                              |
+| Nhận diện sai, dữ liệu khuôn mặt                                                                | Vision tách khỏi LLM; lưu local, có xóa                                       |
+| Phạm vi quá lớn                                                                                 | Lát cắt dọc, mỗi phase chạy được và có demo; có mốc dừng sau Phase 7          |
 
 ### Research backlog (Phase 0)
-| # | Chủ đề | Câu hỏi | Nhóm |
-|---|---|---|---|
-| R1 | Engine LLM Android | llama.cpp (build NDK chính thức vs wrapper) vs MLC, ONNX Runtime GenAI/QNN, LiteRT-LM, ExecuTorch: Snapdragon 8 Gen 2 for Galaxy / SM8550, ARM64, GGUF, structured output/grammar, license, bảo trì | A |
-| R2 | Tăng tốc phần cứng | GPU Adreno / Qualcomm QNN-HTP có dùng được cho LLM trên Z Flip5 không, hay chỉ CPU | A |
-| R3 | Model benchmark | Model card hiện hành Qwen3 0.6B/1.7B + 1–2 model khác: license, tiếng Việt, tool calling | A |
-| R4 | Quantization | Q4_K_M/Q5_K_M/Q6_K/Q8_0: đánh đổi cho điện thoại | A |
-| R5 | STT tiếng Việt | SpeechRecognizer (offline?), sherpa-onnx, whisper.cpp, cloud | B |
-| R6 | TTS tiếng Việt | Android TTS, Piper/sherpa-onnx, cloud | B |
-| R7 | Wake word | openWakeWord, Porcupine, sherpa-onnx KWS cho "Hey Robot" | B |
-| R8 | Giới hạn Android | Mic nền, `AlarmClock` intent, âm lượng, WiFi, quyền | C |
-| R9 | USB phone↔ESP32 | USB host + sạc, thư viện serial, so với BLE/WiFi | C |
-| R10 | Vision | Detector, face recognition, license (AGPL) | Phase 8 |
+| #   | Chủ đề             | Câu hỏi                                                                                                                                                                                             | Nhóm    |
+| --- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| R1  | Engine LLM Android | llama.cpp (build NDK chính thức vs wrapper) vs MLC, ONNX Runtime GenAI/QNN, LiteRT-LM, ExecuTorch: Snapdragon 8 Gen 2 for Galaxy / SM8550, ARM64, GGUF, structured output/grammar, license, bảo trì | A       |
+| R2  | Tăng tốc phần cứng | GPU Adreno / Qualcomm QNN-HTP có dùng được cho LLM trên Z Flip5 không, hay chỉ CPU                                                                                                                  | A       |
+| R3  | Model benchmark    | Model card hiện hành Qwen3 0.6B/1.7B + 1–2 model khác: license, tiếng Việt, tool calling                                                                                                            | A       |
+| R4  | Quantization       | Q4_K_M/Q5_K_M/Q6_K/Q8_0: đánh đổi cho điện thoại                                                                                                                                                    | A       |
+| R5  | STT tiếng Việt     | SpeechRecognizer (offline?), sherpa-onnx, whisper.cpp, cloud                                                                                                                                        | B       |
+| R6  | TTS tiếng Việt     | Android TTS, Piper/sherpa-onnx, cloud                                                                                                                                                               | B       |
+| R7  | Wake word          | openWakeWord, Porcupine, sherpa-onnx KWS cho "Hey Robot"                                                                                                                                            | B       |
+| R8  | Giới hạn Android   | Mic nền, `AlarmClock` intent, âm lượng, WiFi, quyền                                                                                                                                                 | C       |
+| R9  | USB phone↔ESP32    | USB host + sạc, thư viện serial, so với BLE/WiFi                                                                                                                                                    | C       |
+| R10 | Vision             | Detector, face recognition, license (AGPL)                                                                                                                                                          | Phase 8 |
 
 ---
 

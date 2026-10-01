@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Robot</string>
+    <string name="state_idle">Robot đang nghỉ</string>
+    <string name="state_processing">Robot đang suy nghĩ</string>
+    <string name="state_speaking">Robot đang nói</string>
+    <string name="state_error">Robot gặp lỗi</string>
+    <string name="state_awaiting_approval">Chờ duyệt hành động</string>
+    <string name="safe_fallback_msg">Xin lỗi, mình chưa thực hiện được yêu cầu đó.</string>
+</resources>

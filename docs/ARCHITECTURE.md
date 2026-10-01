@@ -52,10 +52,10 @@ Hiện tại (Phase 1 baseline) luật nằm trong `backend/app/actions.py`.
 ## Trạng thái các thành phần
 | Thành phần | Trạng thái |
 |---|---|
-| Backend FastAPI + provider abstraction | Baseline có, sẽ nâng cấp ở Phase 1 |
-| Safety pipeline / action registry | Baseline sơ khai, làm đầy đủ ở Phase 2 |
-| Engine LLM local, model, STT, TTS, wake word | **CHƯA CHỐT** – xem `RESEARCH_BACKLOG.md` |
-| Android: Kotlin hay Flutter | Nghiêng Kotlin, **chưa chốt** |
-| Phone ↔ ESP32 | Nghiêng USB, **chưa chốt** |
+| Backend FastAPI + provider abstraction | **Đã hoàn thành Phase 1** (AI Gateway, SQLite repo, Docker, CI) |
+| Safety pipeline / action registry | **Đã hoàn thành Phase 2** (JSON Schema chung, golden set, eval v0) |
+| App Android (UI Robot, ActionValidator, Executor) | **Đã hoàn thành Phase 3** (Kotlin + Compose, ADR-0006, xác thực trên Z Flip5 thật) |
+| Engine LLM local, model, STT, TTS, wake word | **CHƯA CHỐT** – sẽ thử nghiệm và benchmark ở Phase 4 & Phase 5 |
+| Phone ↔ ESP32 | Nghiêng USB, **chưa chốt** (Phase 9) |
 
-Kết quả nghiên cứu và giới hạn bằng chứng hiện có được ghi trong `docs/research/`. Thiết bị mục tiêu là Samsung Galaxy Z Flip5 với Snapdragon 8 Gen 2 for Galaxy, RAM 8GB và bộ nhớ 512GB. Hiệu năng LLM/voice, phiên bản Android/API thực tế, khả năng tăng tốc từng runtime và khả năng vừa sạc vừa dùng USB host vẫn phải kiểm tra trên chính máy.
+Kết quả nghiên cứu và giới hạn bằng chứng hiện có được ghi trong `docs/research/`. Thiết bị mục tiêu đã được kiểm chứng kết nối và chạy app trực tiếp: Samsung Galaxy Z Flip5 (`SM-F731B`), Android 15 (API 35), One UI 7.0 (`70000`), Snapdragon 8 Gen 2 for Galaxy, RAM 8GB. Hiệu năng chạy LLM local trên máy sẽ được đo lường cụ thể ở Phase 4.

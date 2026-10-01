@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Chỉ cho phép cleartext HTTP tới localhost / 127.0.0.1 phục vụ adb reverse -->
+    <!-- Tuyệt đối không bật cleartext toàn cục ra ngoài Internet -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">localhost</domain>
+    </domain-config>
+</network-security-config>

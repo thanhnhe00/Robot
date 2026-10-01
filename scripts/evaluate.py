@@ -72,15 +72,19 @@ async def run_eval(provider_name: str, golden_path: Path) -> dict[str, Any]:
     results: list[dict[str, Any]] = []
 
     total = len(golden)
+    skipped = 0
     json_valid = 0
     action_correct = 0
     params_correct = 0
+    intent_correct = 0
+    tool_selection_correct = 0
     latencies: list[float] = []
 
     for i, sample in enumerate(golden):
         input_text = sample["input"]
         expected_action = sample.get("expected_action")
         expected_params = sample.get("expected_params")
+        expected_intent = sample.get("intent")  # intent category nếu có trong golden
         sample_id = sample.get("id", f"#{i}")
 
         # Skip các input rỗng (bị chặn bởi validation đầu vào)
@@ -88,8 +92,9 @@ async def run_eval(provider_name: str, golden_path: Path) -> dict[str, Any]:
             results.append({
                 "id": sample_id,
                 "skipped": True,
-                "reason": "empty input",
+                "reason": "empty input (bị chặn bởi ChatRequest validation, min_length=1)",
             })
+            skipped += 1
             total -= 1
             continue
 
@@ -108,6 +113,8 @@ async def run_eval(provider_name: str, golden_path: Path) -> dict[str, Any]:
                 "json_valid": False,
                 "action_match": False,
                 "params_match": False,
+                "intent_match": False,
+                "tool_selection_match": False,
             })
             continue
         elapsed_ms = (time.perf_counter() - start) * 1000
@@ -137,6 +144,23 @@ async def run_eval(provider_name: str, golden_path: Path) -> dict[str, Any]:
         if action_match:
             action_correct += 1
 
+        # Tool selection: model có chọn đúng tool (action type) hay không?
+        # Khác action_match ở chỗ: tool selection chỉ cần type đúng,
+        # kể cả khi validator reject params. Dùng raw action type trước validate.
+        # Vì parse_model_output giờ validate trong, ta dùng action_match + rejection check.
+        actual_proposed = None
+        if parsed and parsed.action:
+            actual_proposed = parsed.action.type
+        elif parsed and parsed.action_rejection:
+            # Action bị reject nhưng model đã đề xuất đúng type
+            # Trích type từ rejection reason (format: "reason:type")
+            parts = (parsed.action_rejection or "").split(":")
+            if len(parts) >= 2:
+                actual_proposed = parts[-1]
+        tool_match = actual_proposed == expected_action if expected_action else actual_action is None
+        if tool_match:
+            tool_selection_correct += 1
+
         # So sánh params
         actual_params = parsed.action.params if parsed and parsed.action else None
         # Nếu expected_params là null, chấp nhận actual_params là None hoặc {}
@@ -154,6 +178,23 @@ async def run_eval(provider_name: str, golden_path: Path) -> dict[str, Any]:
         if params_match and action_match:
             params_correct += 1
 
+        # Intent match: nếu golden set có trường "intent", so sánh
+        intent_match = None
+        if expected_intent:
+            # Intent được suy từ action type:
+            # - expected_action is None → "chat"
+            # - expected_action is not None → expected_action
+            expected_intent_cat = expected_intent
+            if actual_action is None and expected_action is None:
+                actual_intent_cat = "chat"
+            elif actual_action:
+                actual_intent_cat = actual_action
+            else:
+                actual_intent_cat = "chat"  # model không đề xuất action
+            intent_match = actual_intent_cat == expected_intent_cat
+            if intent_match:
+                intent_correct += 1
+
         results.append({
             "id": sample_id,
             "input": input_text[:60],
@@ -162,6 +203,9 @@ async def run_eval(provider_name: str, golden_path: Path) -> dict[str, Any]:
             "json_valid": is_json_valid,
             "action_match": action_match,
             "params_match": params_match,
+            "tool_selection_match": tool_match,
+            "intent_match": intent_match,
+            "action_rejection": parsed.action_rejection if parsed else None,
             "latency_ms": round(elapsed_ms, 2),
         })
 
@@ -169,6 +213,10 @@ async def run_eval(provider_name: str, golden_path: Path) -> dict[str, Any]:
     json_rate = (json_valid / total * 100) if total else 0
     action_rate = (action_correct / total * 100) if total else 0
     params_rate = (params_correct / total * 100) if total else 0
+    tool_rate = (tool_selection_correct / total * 100) if total else 0
+    # Intent rate chỉ tính khi golden set có trường intent
+    samples_with_intent = sum(1 for d in results if d.get("intent_match") is not None)
+    intent_rate = (intent_correct / samples_with_intent * 100) if samples_with_intent else None
     avg_latency = sum(latencies) / len(latencies) if latencies else 0
     p95_latency = sorted(latencies)[int(len(latencies) * 0.95)] if latencies else 0
 
@@ -177,9 +225,12 @@ async def run_eval(provider_name: str, golden_path: Path) -> dict[str, Any]:
         "model": new_settings.model_name,
         "prompt_version": new_settings.prompt_version,
         "total_samples": total,
+        "skipped_samples": skipped,
         "json_validity_pct": round(json_rate, 1),
         "action_accuracy_pct": round(action_rate, 1),
         "params_accuracy_pct": round(params_rate, 1),
+        "tool_selection_accuracy_pct": round(tool_rate, 1),
+        "intent_accuracy_pct": round(intent_rate, 1) if intent_rate is not None else None,
         "avg_latency_ms": round(avg_latency, 2),
         "p95_latency_ms": round(p95_latency, 2),
     }
@@ -190,9 +241,22 @@ async def run_eval(provider_name: str, golden_path: Path) -> dict[str, Any]:
 def format_report(data: dict[str, Any]) -> str:
     """Tạo markdown report."""
     s = data["summary"]
+    is_mock = s["provider"] == "mock"
+
     lines = [
         "# Phase 2 – Evaluation v0 Report",
         "",
+    ]
+
+    if is_mock:
+        lines += [
+            "> **⚠️ DISCLAIMER**: Báo cáo này chạy bằng **MockProvider** (rule-based, không phải AI model).",
+            "> Kết quả phản ánh khả năng pattern matching của mock, **không phải benchmark AI thật**.",
+            "> Không sử dụng số liệu này trong portfolio hoặc so sánh model.",
+            "",
+        ]
+
+    lines += [
         "## Tổng quan",
         "",
         "| Metric | Giá trị |",
@@ -200,27 +264,47 @@ def format_report(data: dict[str, Any]) -> str:
         f"| Provider | {s['provider']} |",
         f"| Model | {s['model']} |",
         f"| Prompt version | {s['prompt_version']} |",
-        f"| Tổng mẫu | {s['total_samples']} |",
+        f"| Tổng mẫu đánh giá | {s['total_samples']} |",
+    ]
+
+    if s["skipped_samples"] > 0:
+        lines.append(
+            f"| Mẫu bỏ qua | {s['skipped_samples']} (input rỗng, bị ChatRequest min_length=1 chặn) |"
+        )
+
+    lines += [
         f"| JSON validity | {s['json_validity_pct']}% |",
         f"| Action accuracy | {s['action_accuracy_pct']}% |",
         f"| Params accuracy | {s['params_accuracy_pct']}% |",
+        f"| Tool selection accuracy | {s['tool_selection_accuracy_pct']}% |",
+    ]
+
+    if s.get("intent_accuracy_pct") is not None:
+        lines.append(f"| Intent accuracy | {s['intent_accuracy_pct']}% |")
+    else:
+        lines.append("| Intent accuracy | N/A (golden set chưa có trường `intent`) |")
+
+    lines += [
         f"| Avg latency | {s['avg_latency_ms']}ms |",
         f"| P95 latency | {s['p95_latency_ms']}ms |",
         "",
         "## Chi tiết",
         "",
-        "| ID | Input | Expected | Actual | JSON | Action | Params | Latency |",
-        "|---|---|---|---|---|---|---|---|",
+        "| ID | Input | Expected | Actual | JSON | Action | Params | Tool | Latency |",
+        "|---|---|---|---|---|---|---|---|---|",
     ]
     for d in data["details"]:
         if d.get("skipped"):
+            lines.append(f"| {d['id']} | _(skipped: {d.get('reason', '')})_ | - | - | - | - | - | - | - |")
             continue
+        rejection = f" ⚠️{d['action_rejection']}" if d.get("action_rejection") else ""
         lines.append(
             f"| {d['id']} | {d.get('input', '')[:30]} | "
-            f"{d.get('expected_action', '-')} | {d.get('actual_action', '-')} | "
+            f"{d.get('expected_action', '-')} | {d.get('actual_action', '-')}{rejection} | "
             f"{'✅' if d.get('json_valid') else '❌'} | "
             f"{'✅' if d.get('action_match') else '❌'} | "
             f"{'✅' if d.get('params_match') else '❌'} | "
+            f"{'✅' if d.get('tool_selection_match') else '❌'} | "
             f"{d.get('latency_ms', '-')} |"
         )
     return "\n".join(lines) + "\n"
@@ -272,11 +356,20 @@ def main() -> None:
 
     # Tóm tắt nhanh trên console
     s = data["summary"]
-    print(f"\n{'='*50}")
+    print(f"\n{'='*60}")
+    if s["provider"] == "mock":
+        print("⚠️  MockProvider — kết quả KHÔNG phải AI benchmark")
     print(f"Provider: {s['provider']} | Model: {s['model']}")
-    print(f"JSON: {s['json_validity_pct']}% | Action: {s['action_accuracy_pct']}% | Params: {s['params_accuracy_pct']}%")
+    print(
+        f"JSON: {s['json_validity_pct']}% | Action: {s['action_accuracy_pct']}% | "
+        f"Params: {s['params_accuracy_pct']}% | Tool: {s['tool_selection_accuracy_pct']}%"
+    )
+    if s.get("intent_accuracy_pct") is not None:
+        print(f"Intent: {s['intent_accuracy_pct']}%")
     print(f"Latency: avg={s['avg_latency_ms']}ms p95={s['p95_latency_ms']}ms")
-    print(f"{'='*50}")
+    if s["skipped_samples"] > 0:
+        print(f"Skipped: {s['skipped_samples']} mẫu (input rỗng)")
+    print(f"{'='*60}")
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ An toàn: action ngoài registry luôn bị từ chối (whitelist, không black
 
 from __future__ import annotations
 
+import math
 import re
 from dataclasses import dataclass
 from enum import StrEnum
@@ -30,6 +31,28 @@ class HardwareStatus(StrEnum):
 
     READY = "ready"  # sẵn sàng thực thi
     STUB = "stub"  # đăng ký schema nhưng chưa nối (ESP32 chưa có)
+
+
+def _strict_int(value: Any) -> int | None:
+    """Ép sang int chặt: chỉ nhận int thật, không nhận bool/float/str/Inf/NaN.
+
+    - bool bị từ chối vì ``isinstance(True, int)`` là True trong Python.
+    - float bị từ chối vì ``int(50.9)`` cắt ngầm thành 50.
+    - str bị từ chối vì ``int("50")`` ép ngầm.
+    - Infinity/NaN gây OverflowError khi gọi ``int()``.
+    """
+    if isinstance(value, bool):
+        return None
+    if not isinstance(value, int):
+        return None
+    # int thật trong Python không có Inf/NaN, nhưng phòng trường hợp
+    # ai đó serialize float rồi truyền vào
+    try:
+        if math.isnan(value) or math.isinf(value):
+            return None
+    except (TypeError, OverflowError):
+        return None
+    return value
 
 
 @dataclass(frozen=True)
@@ -78,7 +101,9 @@ def _validate_set_alarm(params: dict[str, Any]) -> dict[str, Any] | None:
     result: dict[str, Any] = {"time": t}
     label = params.get("label")
     if label is not None:
-        label = str(label).strip()[:100]
+        if not isinstance(label, str):
+            return None
+        label = label.strip()[:100]
         if label:
             result["label"] = label
     return result
@@ -98,9 +123,8 @@ def _validate_open_app(params: dict[str, Any]) -> dict[str, Any] | None:
 
 
 def _validate_set_volume(params: dict[str, Any]) -> dict[str, Any] | None:
-    try:
-        level = int(params.get("level"))  # type: ignore[arg-type]
-    except (TypeError, ValueError):
+    level = _strict_int(params.get("level"))
+    if level is None:
         return None
     return {"level": level} if 0 <= level <= 100 else None
 
@@ -113,16 +137,14 @@ def _validate_move(params: dict[str, Any]) -> dict[str, Any] | None:
     if direction not in DIRECTION_VALUES:
         return None
     result: dict[str, Any] = {"direction": direction}
-    try:
-        speed = int(params.get("speed", 50))
-    except (TypeError, ValueError):
+    speed = _strict_int(params.get("speed", 50))
+    if speed is None:
         return None
     if not 0 <= speed <= 100:
         return None
     result["speed"] = speed
-    try:
-        duration_ms = int(params.get("duration_ms", 1000))
-    except (TypeError, ValueError):
+    duration_ms = _strict_int(params.get("duration_ms", 1000))
+    if duration_ms is None:
         return None
     if not 0 <= duration_ms <= 5000:
         return None

@@ -7,3 +7,18 @@ __pycache__/
 *.gguf
 ai/models/*
 !ai/models/.gitkeep
+
+# Android
+android/local.properties
+android/.gradle/
+android/build/
+android/*/build/
+android/.idea/
+android/*.iml
+android/captures/
+android/.externalNativeBuild/
+android/.cxx/
+local.properties
+.gradle/
+*.keystore
+*.jks

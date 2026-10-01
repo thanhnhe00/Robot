@@ -44,8 +44,9 @@ class TestWhitelist:
         "GET_TIME",  # case-sensitive
     ])
     def test_unknown_action_rejected(self, action_type):
-        result = validate_action({"type": action_type, "params": {}})
-        assert result is None, f"Action '{action_type}' ngoài whitelist phải bị từ chối"
+        action, reason = validate_action({"type": action_type, "params": {}})
+        assert action is None, f"Action '{action_type}' ngoài whitelist phải bị từ chối"
+        assert "unknown_type" in reason
 
     def test_whitelist_is_exhaustive(self):
         """Registry chỉ chứa action đã đăng ký."""
@@ -67,7 +68,9 @@ class TestInvalidParams:
         {"type": "set_alarm", "params": {"time": ""}},  # rỗng
     ])
     def test_set_alarm_bad_params(self, raw):
-        assert validate_action(raw) is None
+        action, reason = validate_action(raw)
+        assert action is None
+        assert reason != "ok"
 
     @pytest.mark.parametrize("raw", [
         {"type": "open_app", "params": {}},  # thiếu package
@@ -77,7 +80,9 @@ class TestInvalidParams:
         {"type": "open_app", "params": {"package": 123}},  # sai kiểu
     ])
     def test_open_app_bad_params(self, raw):
-        assert validate_action(raw) is None
+        action, reason = validate_action(raw)
+        assert action is None
+        assert reason != "ok"
 
     @pytest.mark.parametrize("raw", [
         {"type": "set_volume", "params": {}},  # thiếu level
@@ -88,17 +93,25 @@ class TestInvalidParams:
         {"type": "set_volume", "params": {"level": None}},
     ])
     def test_set_volume_bad_params(self, raw):
-        assert validate_action(raw) is None
+        action, reason = validate_action(raw)
+        assert action is None
+        assert reason != "ok"
 
     def test_params_not_dict(self):
-        assert validate_action({"type": "get_time", "params": "string"}) is None
-        assert validate_action({"type": "get_time", "params": [1, 2]}) is None
+        action, _ = validate_action({"type": "get_time", "params": "string"})
+        assert action is None
+        action, _ = validate_action({"type": "get_time", "params": [1, 2]})
+        assert action is None
 
     def test_raw_not_dict(self):
-        assert validate_action("not a dict") is None
-        assert validate_action(42) is None
-        assert validate_action(None) is None
-        assert validate_action([]) is None
+        action, _ = validate_action("not a dict")
+        assert action is None
+        action, _ = validate_action(42)
+        assert action is None
+        action, _ = validate_action(None)
+        assert action is None
+        action, _ = validate_action([])
+        assert action is None
 
 
 # ── 3. Action hợp lệ được chấp nhận ─────────────────────────────────
@@ -108,38 +121,38 @@ class TestValidActions:
     """Action hợp lệ được chấp nhận với params đã làm sạch."""
 
     def test_get_time(self):
-        result = validate_action({"type": "get_time", "params": {}})
-        assert result is not None
-        assert result.type == "get_time"
-        assert result.params == {}
+        action, reason = validate_action({"type": "get_time", "params": {}})
+        assert action is not None and reason == "ok"
+        assert action.type == "get_time"
+        assert action.params == {}
 
     def test_get_battery(self):
-        result = validate_action({"type": "get_battery", "params": {}})
-        assert result is not None
-        assert result.type == "get_battery"
+        action, reason = validate_action({"type": "get_battery", "params": {}})
+        assert action is not None and reason == "ok"
+        assert action.type == "get_battery"
 
     def test_set_alarm_valid(self):
-        result = validate_action({"type": "set_alarm", "params": {"time": "07:30"}})
-        assert result is not None
-        assert result.params == {"time": "07:30"}
+        action, reason = validate_action({"type": "set_alarm", "params": {"time": "07:30"}})
+        assert action is not None and reason == "ok"
+        assert action.params == {"time": "07:30"}
 
     def test_set_alarm_with_label(self):
-        result = validate_action({"type": "set_alarm", "params": {"time": "06:00", "label": "Dậy đi học"}})
-        assert result is not None
-        assert result.params["time"] == "06:00"
-        assert result.params["label"] == "Dậy đi học"
+        action, reason = validate_action({"type": "set_alarm", "params": {"time": "06:00", "label": "Dậy đi học"}})
+        assert action is not None and reason == "ok"
+        assert action.params["time"] == "06:00"
+        assert action.params["label"] == "Dậy đi học"
 
     @pytest.mark.parametrize("package", list(ALLOWED_PACKAGES))
     def test_open_app_whitelisted(self, package):
-        result = validate_action({"type": "open_app", "params": {"package": package}})
-        assert result is not None
-        assert result.params["package"] == package
+        action, reason = validate_action({"type": "open_app", "params": {"package": package}})
+        assert action is not None and reason == "ok"
+        assert action.params["package"] == package
 
     @pytest.mark.parametrize("level", [0, 50, 100])
     def test_set_volume_valid(self, level):
-        result = validate_action({"type": "set_volume", "params": {"level": level}})
-        assert result is not None
-        assert result.params["level"] == level
+        action, reason = validate_action({"type": "set_volume", "params": {"level": level}})
+        assert action is not None and reason == "ok"
+        assert action.params["level"] == level
 
 
 # ── 4. Action STUB bị từ chối ────────────────────────────────────────
@@ -149,15 +162,17 @@ class TestStubActions:
     """Action có hardware=STUB phải bị validate_action từ chối."""
 
     def test_move_rejected(self):
-        result = validate_action({
+        action, reason = validate_action({
             "type": "move",
             "params": {"direction": "forward", "speed": 50, "duration_ms": 1000},
         })
-        assert result is None, "move là STUB, phải bị từ chối"
+        assert action is None, "move là STUB, phải bị từ chối"
+        assert "hardware_stub" in reason
 
     def test_stop_rejected(self):
-        result = validate_action({"type": "stop", "params": {}})
-        assert result is None, "stop là STUB, phải bị từ chối"
+        action, reason = validate_action({"type": "stop", "params": {}})
+        assert action is None, "stop là STUB, phải bị từ chối"
+        assert "hardware_stub" in reason
 
     def test_stub_not_in_executable(self):
         for name, spec in REGISTRY.items():
@@ -207,6 +222,8 @@ class TestJsonFallback:
         )
         assert result.action is None
         assert result.response == "ok"
+        assert result.action_rejection is not None
+        assert "unknown_type" in result.action_rejection
 
 
 # ── 6. Fallback khi JSON liên tục sai ───────────────────────────────

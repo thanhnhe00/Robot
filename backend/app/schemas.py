@@ -39,3 +39,4 @@ class ChatResponse(BaseModel):
 
     response: str
     action: Action | None = None
+    action_rejection: str | None = None

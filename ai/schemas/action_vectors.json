@@ -1,0 +1,284 @@
+[
+  {
+    "id": "get_time_normal",
+    "description": "get_time với params rỗng",
+    "action": { "type": "get_time", "params": {} },
+    "expected": { "type": "get_time", "params": {} }
+  },
+  {
+    "id": "get_time_null_params",
+    "description": "get_time với params null được chuẩn hóa thành rỗng",
+    "action": { "type": "get_time", "params": null },
+    "expected": { "type": "get_time", "params": {} }
+  },
+  {
+    "id": "get_time_extra_params",
+    "description": "get_time với params thừa bị loại bỏ",
+    "action": { "type": "get_time", "params": { "x": 1 } },
+    "expected": { "type": "get_time", "params": {} }
+  },
+  {
+    "id": "get_time_whitespace",
+    "description": "get_time có khoảng trắng ở type được trim",
+    "action": { "type": " get_time " },
+    "expected": { "type": "get_time", "params": {} }
+  },
+  {
+    "id": "get_time_uppercase",
+    "description": "GET_TIME chữ hoa bị từ chối do phân biệt hoa thường",
+    "action": { "type": "GET_TIME" },
+    "expected": null
+  },
+  {
+    "id": "get_battery_normal",
+    "description": "get_battery không có params",
+    "action": { "type": "get_battery" },
+    "expected": { "type": "get_battery", "params": {} }
+  },
+  {
+    "id": "set_alarm_normal",
+    "description": "set_alarm với giờ hợp lệ",
+    "action": { "type": "set_alarm", "params": { "time": "07:30" } },
+    "expected": { "type": "set_alarm", "params": { "time": "07:30" } }
+  },
+  {
+    "id": "set_alarm_label_trimmed",
+    "description": "set_alarm với label có khoảng trắng hai đầu được trim",
+    "action": { "type": "set_alarm", "params": { "time": "07:30", "label": " Đi học " } },
+    "expected": { "type": "set_alarm", "params": { "time": "07:30", "label": "Đi học" } }
+  },
+  {
+    "id": "set_alarm_label_whitespace_only",
+    "description": "set_alarm với label chỉ có khoảng trắng thì bị loại bỏ",
+    "action": { "type": "set_alarm", "params": { "time": "07:30", "label": "   " } },
+    "expected": { "type": "set_alarm", "params": { "time": "07:30" } }
+  },
+  {
+    "id": "set_alarm_label_150_chars",
+    "description": "set_alarm với label dài 150 ký tự bị cắt còn đúng 100 code point",
+    "action": { "type": "set_alarm", "params": { "time": "07:30", "label": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" } },
+    "expected": { "type": "set_alarm", "params": { "time": "07:30", "label": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" } }
+  },
+  {
+    "id": "set_alarm_invalid_24_00",
+    "description": "set_alarm giờ 24:00 không hợp lệ",
+    "action": { "type": "set_alarm", "params": { "time": "24:00" } },
+    "expected": null
+  },
+  {
+    "id": "set_alarm_invalid_7_30",
+    "description": "set_alarm giờ thiếu số 0 đầu 7:30 không hợp lệ",
+    "action": { "type": "set_alarm", "params": { "time": "7:30" } },
+    "expected": null
+  },
+  {
+    "id": "set_alarm_invalid_07_60",
+    "description": "set_alarm phút 60 không hợp lệ",
+    "action": { "type": "set_alarm", "params": { "time": "07:60" } },
+    "expected": null
+  },
+  {
+    "id": "set_alarm_invalid_0730",
+    "description": "set_alarm thiếu dấu hai chấm 0730 không hợp lệ",
+    "action": { "type": "set_alarm", "params": { "time": "0730" } },
+    "expected": null
+  },
+  {
+    "id": "set_alarm_missing_time",
+    "description": "set_alarm thiếu trường time bắt buộc",
+    "action": { "type": "set_alarm", "params": {} },
+    "expected": null
+  },
+  {
+    "id": "set_alarm_time_is_number",
+    "description": "set_alarm trường time là số 730 thay vì chuỗi",
+    "action": { "type": "set_alarm", "params": { "time": 730 } },
+    "expected": null
+  },
+  {
+    "id": "set_alarm_label_is_number_5",
+    "description": "set_alarm label là số 5 thay vì chuỗi (Cần quyết định: mục tiêu null hoặc bỏ label)",
+    "action": { "type": "set_alarm", "params": { "time": "07:30", "label": 5 } },
+    "expected": null
+  },
+  {
+    "id": "open_app_youtube",
+    "description": "open_app mở YouTube trong whitelist",
+    "action": { "type": "open_app", "params": { "package": "com.google.android.youtube" } },
+    "expected": { "type": "open_app", "params": { "package": "com.google.android.youtube" } }
+  },
+  {
+    "id": "open_app_chrome",
+    "description": "open_app mở Chrome trong whitelist",
+    "action": { "type": "open_app", "params": { "package": "com.android.chrome" } },
+    "expected": { "type": "open_app", "params": { "package": "com.android.chrome" } }
+  },
+  {
+    "id": "open_app_settings",
+    "description": "open_app mở Settings trong whitelist",
+    "action": { "type": "open_app", "params": { "package": "com.android.settings" } },
+    "expected": { "type": "open_app", "params": { "package": "com.android.settings" } }
+  },
+  {
+    "id": "open_app_spotify",
+    "description": "open_app mở Spotify trong whitelist",
+    "action": { "type": "open_app", "params": { "package": "com.spotify.music" } },
+    "expected": { "type": "open_app", "params": { "package": "com.spotify.music" } }
+  },
+  {
+    "id": "open_app_whitespace",
+    "description": "open_app package có khoảng trắng hai đầu được trim",
+    "action": { "type": "open_app", "params": { "package": " com.android.chrome " } },
+    "expected": { "type": "open_app", "params": { "package": "com.android.chrome" } }
+  },
+  {
+    "id": "open_app_uppercase",
+    "description": "open_app package viết hoa không khớp whitelist phân biệt hoa thường",
+    "action": { "type": "open_app", "params": { "package": "COM.ANDROID.CHROME" } },
+    "expected": null
+  },
+  {
+    "id": "open_app_evil",
+    "description": "open_app package ngoài whitelist bị từ chối",
+    "action": { "type": "open_app", "params": { "package": "com.evil.app" } },
+    "expected": null
+  },
+  {
+    "id": "open_app_missing_pkg",
+    "description": "open_app thiếu trường package",
+    "action": { "type": "open_app", "params": {} },
+    "expected": null
+  },
+  {
+    "id": "open_app_pkg_is_number",
+    "description": "open_app package là số",
+    "action": { "type": "open_app", "params": { "package": 123 } },
+    "expected": null
+  },
+  {
+    "id": "set_volume_0",
+    "description": "set_volume mức tối thiểu 0",
+    "action": { "type": "set_volume", "params": { "level": 0 } },
+    "expected": { "type": "set_volume", "params": { "level": 0 } }
+  },
+  {
+    "id": "set_volume_50",
+    "description": "set_volume mức 50",
+    "action": { "type": "set_volume", "params": { "level": 50 } },
+    "expected": { "type": "set_volume", "params": { "level": 50 } }
+  },
+  {
+    "id": "set_volume_100",
+    "description": "set_volume mức tối đa 100",
+    "action": { "type": "set_volume", "params": { "level": 100 } },
+    "expected": { "type": "set_volume", "params": { "level": 100 } }
+  },
+  {
+    "id": "set_volume_101",
+    "description": "set_volume vượt quá 100",
+    "action": { "type": "set_volume", "params": { "level": 101 } },
+    "expected": null
+  },
+  {
+    "id": "set_volume_neg_1",
+    "description": "set_volume số âm",
+    "action": { "type": "set_volume", "params": { "level": -1 } },
+    "expected": null
+  },
+  {
+    "id": "set_volume_string_50",
+    "description": "set_volume chuỗi '50' bị từ chối",
+    "action": { "type": "set_volume", "params": { "level": "50" } },
+    "expected": null
+  },
+  {
+    "id": "set_volume_float_50_5",
+    "description": "set_volume số thực 50.5 bị từ chối",
+    "action": { "type": "set_volume", "params": { "level": 50.5 } },
+    "expected": null
+  },
+  {
+    "id": "set_volume_float_50_0",
+    "description": "set_volume số thực 50.0 bị từ chối",
+    "action": { "type": "set_volume", "params": { "level": 50.0 } },
+    "expected": null
+  },
+  {
+    "id": "set_volume_bool_true",
+    "description": "set_volume boolean true bị từ chối",
+    "action": { "type": "set_volume", "params": { "level": true } },
+    "expected": null
+  },
+  {
+    "id": "set_volume_null",
+    "description": "set_volume level null bị từ chối",
+    "action": { "type": "set_volume", "params": { "level": null } },
+    "expected": null
+  },
+  {
+    "id": "set_volume_1e999",
+    "description": "set_volume số vô cực 1e999 bị từ chối",
+    "action": { "type": "set_volume", "params": { "level": 1e999 } },
+    "expected": null
+  },
+  {
+    "id": "set_volume_huge_int",
+    "description": "set_volume số nguyên cực lớn vượt ngưỡng",
+    "action": { "type": "set_volume", "params": { "level": 99999999999999999999 } },
+    "expected": null
+  },
+  {
+    "id": "general_call_phone",
+    "description": "action ngoài registry bị từ chối",
+    "action": { "type": "call_phone" },
+    "expected": null
+  },
+  {
+    "id": "general_empty_type",
+    "description": "action type rỗng bị từ chối",
+    "action": { "type": "" },
+    "expected": null
+  },
+  {
+    "id": "general_missing_type",
+    "description": "action thiếu trường type bị từ chối",
+    "action": {},
+    "expected": null
+  },
+  {
+    "id": "general_action_is_string",
+    "description": "action là chuỗi thay vì object bị từ chối",
+    "action": "get_time",
+    "expected": null
+  },
+  {
+    "id": "general_action_is_list",
+    "description": "action là mảng thay vì object bị từ chối",
+    "action": [],
+    "expected": null
+  },
+  {
+    "id": "general_params_is_list",
+    "description": "params là mảng thay vì object bị từ chối",
+    "action": { "type": "get_time", "params": [] },
+    "expected": null
+  },
+  {
+    "id": "general_params_is_string",
+    "description": "params là chuỗi thay vì object bị từ chối",
+    "action": { "type": "get_time", "params": "invalid" },
+    "expected": null
+  },
+  {
+    "id": "stub_move",
+    "description": "move là STUB chưa nối ESP32 nên luôn bị từ chối",
+    "action": { "type": "move", "params": { "direction": "forward" } },
+    "expected": null
+  },
+  {
+    "id": "stub_stop",
+    "description": "stop là STUB chưa nối ESP32 nên luôn bị từ chối",
+    "action": { "type": "stop" },
+    "expected": null
+  }
+]

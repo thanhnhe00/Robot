@@ -99,16 +99,34 @@ async def chat(req: ChatRequest):
 
 
 @app.websocket("/ws")
-async def ws_chat(ws: WebSocket, key: str = ""):
-    if settings.api_key and not secrets.compare_digest(key, settings.api_key):
-        await ws.close(code=1008)
-        return
+async def ws_chat(ws: WebSocket):
+    """WebSocket chat endpoint.
 
+    Auth: nếu API_KEY được cấu hình, client gửi message đầu tiên dạng
+    ``{"auth": "<key>", "session_id": "...", "text": "..."}``
+    hoặc ``{"auth": "<key>"}`` rồi gửi request sau.
+    Key KHÔNG truyền qua query param ``?key=`` vì dễ lộ trong log/URL.
+    """
     await ws.accept()
+    authenticated = not settings.api_key  # no key configured → auto-auth
+
     try:
         while True:
             try:
-                req = ChatRequest.model_validate(await ws.receive_json())
+                data = await ws.receive_json()
+
+                # Auth check trên message đầu tiên
+                if not authenticated:
+                    client_key = data.pop("auth", "")
+                    if not secrets.compare_digest(str(client_key), settings.api_key):
+                        await ws.close(code=1008, reason="Sai API key")
+                        return
+                    authenticated = True
+                    # Nếu message chỉ chứa auth, đợi message tiếp
+                    if not data.get("text"):
+                        continue
+
+                req = ChatRequest.model_validate(data)
                 res = await handle_chat(req.session_id, req.text)
                 await ws.send_json(res.model_dump())
             except WebSocketDisconnect:

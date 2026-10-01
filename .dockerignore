@@ -1,0 +1,67 @@
+# Bỏ file không cần trong Docker image
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Virtual environments
+.venv/
+backend/.venv/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Agent / AI config (không cần trong runtime container)
+.agents/
+AGENTS.md
+
+# Docs & scripts (không cần trong runtime)
+docs/
+scripts/
+tests/
+backend/tests/
+
+# Model weights — có thể rất lớn (*.gguf)
+ai/models/
+*.gguf
+
+# Dataset & evaluation (không cần trong runtime)
+ai/datasets/
+ai/evaluation/
+ai/training/
+
+# Dashboard & firmware (chưa dùng)
+dashboard/
+firmware/
+android/
+
+# Docker files (tránh đệ quy)
+docker/
+docker-compose.yml
+Dockerfile*
+
+# Env files
+.env
+.env.*
+backend/.env
+backend/.env.*
+
+# Database (sẽ mount volume riêng)
+*.db
+
+# Misc
+README.md
+LICENSE
+*.md

@@ -83,11 +83,20 @@ def test_ws_auth(monkeypatch):
         dataclasses.replace(settings, api_key="secret123"),
     )
     with TestClient(app) as c:
+        # Sai auth → bị close
         with pytest.raises(Exception):
-            with c.websocket_connect("/ws?key=wrong") as ws:
+            with c.websocket_connect("/ws") as ws:
+                ws.send_json({"auth": "wrong", "session_id": "w", "text": "alo"})
                 ws.receive_json()
 
-        with c.websocket_connect("/ws?key=secret123") as ws:
+        # Đúng auth gửi kèm request → nhận response
+        with c.websocket_connect("/ws") as ws:
+            ws.send_json({"auth": "secret123", "session_id": "w", "text": "pin còn bao nhiêu"})
+            assert ws.receive_json()["action"]["type"] == "get_battery"
+
+        # Auth riêng rồi gửi request sau
+        with c.websocket_connect("/ws") as ws:
+            ws.send_json({"auth": "secret123"})
             ws.send_json({"session_id": "w", "text": "pin còn bao nhiêu"})
             assert ws.receive_json()["action"]["type"] == "get_battery"
 

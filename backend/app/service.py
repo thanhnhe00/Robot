@@ -34,6 +34,9 @@ async def handle_chat(session_id: str, text: str) -> ChatResponse:
 
         try:
             result = parse_model_output(raw)
+            # Model parsed OK, but validator may have rejected the action
+            if result.action_rejection:
+                validation = "action_rejected"
         except ValueError:
             validation = "retry"
             log.warning(
@@ -50,6 +53,8 @@ async def handle_chat(session_id: str, text: str) -> ChatResponse:
             try:
                 result = parse_model_output(raw)
                 validation = "retry_recovered"
+                if result.action_rejection:
+                    validation = "retry_action_rejected"
             except ValueError:
                 result = ChatResponse(response=FALLBACK_RESPONSE, action=None)
                 validation = "fallback_text"
@@ -68,6 +73,7 @@ async def handle_chat(session_id: str, text: str) -> ChatResponse:
                 "latency_ms": round((time.perf_counter() - started) * 1000, 2),
                 "response": {"chars": len(result.response)},
                 "action": result.action.type if result.action else None,
+                "action_rejection": result.action_rejection,
                 "validation": validation,
             },
         )

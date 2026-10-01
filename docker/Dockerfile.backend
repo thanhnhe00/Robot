@@ -6,13 +6,23 @@ COPY backend/requirements.txt /app/backend/requirements.txt
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 
 COPY backend/app /app/backend/app
-COPY ai /app/ai
+COPY ai/prompts /app/ai/prompts
+COPY ai/schemas /app/ai/schemas
+COPY ai/robot_personality.yaml /app/ai/robot_personality.yaml
 
 WORKDIR /app/backend
 
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV DB_PATH=/data/robot.db
+
+# Chạy non-root để giảm bề mặt tấn công
+RUN groupadd --gid 1000 robot \
+    && useradd --uid 1000 --gid robot --shell /bin/false robot \
+    && mkdir -p /data \
+    && chown robot:robot /data
+
+USER robot
 
 EXPOSE 8000
 

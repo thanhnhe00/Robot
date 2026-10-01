@@ -35,4 +35,4 @@ Thay đổi so với bản gốc:
 
 Quy tắc thông thường: xong phase trước rồi mới sang phase sau. Ngoại lệ hiện tại: theo chỉ đạo của chủ dự án, thực hành Phase 1 trước và quay lại đóng Phase 0 sau.
 
-Trạng thái tại 2026-09-30: Phase 1 đang được thực hành trước theo chỉ đạo của chủ dự án; Phase 0 research có sẵn nhưng phần review/đóng phase được hoãn. Backend baseline đã có. Benchmark LLM/voice trên Samsung Galaxy Z Flip5 và kiểm tra USB phụ thuộc thiết bị được thực hiện ở các phase tương ứng.
+Trạng thái tại 2026-10-01: Phase 1 (AI Gateway), Phase 2 (Action Registry & Eval v0), và Phase 3 (Android App + Safety Pipeline + Robot Face + Action Executor trên Samsung Galaxy Z Flip5) đã hoàn thành. Sẵn sàng bắt đầu Phase 4 (Spike LLM trên Z Flip5 + Model Manager v0).
