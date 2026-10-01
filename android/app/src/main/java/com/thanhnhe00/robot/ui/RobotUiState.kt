@@ -7,11 +7,12 @@ import com.thanhnhe00.robot.domain.state.RobotState
 enum class ProviderChoice(val title: String, val subtitle: String) {
     BACKEND("Backend (FastAPI)", "Kết nối laptop qua ADB reverse (127.0.0.1:8000)"),
     MOCK("Mock (Offline)", "Luật cục bộ xác định, không cần mạng"),
+    LOCAL("Local LLM (Z Flip5)", "Chạy mô hình AI trực tiếp trên máy không cần mạng"),
     DEBUG_SCRIPTED("Debug (An Toàn)", "Kịch bản test vi phạm & từ chối an toàn")
 }
 
 /**
- * Toàn bộ trạng thái giao diện của Robot (Phase 3.5).
+ * Toàn bộ trạng thái giao diện của Robot (Phase 3.5 & Phase 4).
  */
 data class RobotUiState(
     val robotState: RobotState = RobotState.IDLE,
@@ -22,6 +23,7 @@ data class RobotUiState(
     val lastExecutionResult: ExecutionResult? = null,
     val safetyWarning: String? = null,
     val errorMessage: String? = null,
+    val localModelInfo: String? = null,
     val isProcessing: Boolean = false
 ) {
     val isAwaitingApproval: Boolean get() = pendingAction != null

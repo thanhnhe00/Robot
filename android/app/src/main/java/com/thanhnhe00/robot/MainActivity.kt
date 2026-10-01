@@ -1,6 +1,8 @@
 package com.thanhnhe00.robot
 
 import android.os.Bundle
+import android.app.ActivityManager
+import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -62,8 +64,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.thanhnhe00.robot.data.provider.BackendProvider
 import com.thanhnhe00.robot.data.provider.DebugScriptedProvider
 import com.thanhnhe00.robot.data.provider.MockProvider
+import com.thanhnhe00.robot.data.provider.local.LocalProvider
+import com.thanhnhe00.robot.data.provider.local.NativeLlamaBridge
 import com.thanhnhe00.robot.domain.action.ValidatedAction
 import com.thanhnhe00.robot.domain.exec.ActionExecutor
+import com.thanhnhe00.robot.domain.model.DefaultModelManager
+import com.thanhnhe00.robot.domain.model.MemoryGuard
 import com.thanhnhe00.robot.platform.AndroidAlarmScheduler
 import com.thanhnhe00.robot.platform.AndroidAppLauncher
 import com.thanhnhe00.robot.platform.AndroidBatteryReader
@@ -76,6 +82,7 @@ import com.thanhnhe00.robot.ui.RobotSpeechBubble
 import com.thanhnhe00.robot.ui.RobotViewModel
 import com.thanhnhe00.robot.ui.theme.RobotTheme
 import kotlinx.coroutines.launch
+import java.io.File
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -123,6 +130,27 @@ fun RobotMainScreen(modifier: Modifier = Modifier) {
     val mockProvider = remember { MockProvider() }
     val debugProvider = remember { DebugScriptedProvider() }
 
+    val modelManager = remember {
+        DefaultModelManager(
+            modelsDirectory = File(context.filesDir, "models")
+        )
+    }
+    val memoryGuard = remember { MemoryGuard() }
+    val nativeBridge = remember { NativeLlamaBridge() }
+    val localProvider = remember {
+        LocalProvider(
+            modelManager = modelManager,
+            memoryGuard = memoryGuard,
+            runtime = nativeBridge,
+            availableMemoryReader = {
+                val actManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                val memInfo = ActivityManager.MemoryInfo()
+                actManager.getMemoryInfo(memInfo)
+                memInfo.availMem
+            }
+        )
+    }
+
     val viewModel: RobotViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -131,7 +159,8 @@ fun RobotMainScreen(modifier: Modifier = Modifier) {
                     backendProvider = backendProvider,
                     mockProvider = mockProvider,
                     debugProvider = debugProvider,
-                    executor = executor
+                    executor = executor,
+                    localProvider = localProvider
                 ) as T
             }
         }
@@ -332,6 +361,23 @@ fun RobotMainScreen(modifier: Modifier = Modifier) {
                                 )
                             }
                         }
+                    }
+
+                    if (uiState.selectedProvider == ProviderChoice.LOCAL) {
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp))
+                        val selectedModel = modelManager.getSelectedModel()
+                        Text(
+                            text = "Mô hình: ${selectedModel?.displayName ?: "Chưa chọn"} (${selectedModel?.parameterSize ?: ""})",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        val statusText = if (nativeBridge.isModelLoaded) "Đã nạp vào RAM native" else "Sẵn sàng nạp khi gửi câu hỏi"
+                        Text(
+                            text = "Trạng thái runtime: $statusText",
+                            fontSize = 10.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }

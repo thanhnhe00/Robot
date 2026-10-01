@@ -24,7 +24,8 @@ class RobotViewModel(
     private val backendProvider: AIProvider,
     private val mockProvider: AIProvider,
     private val debugProvider: AIProvider,
-    private val executor: ActionExecutor
+    private val executor: ActionExecutor,
+    private val localProvider: AIProvider? = null
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RobotUiState())
@@ -41,6 +42,7 @@ class RobotViewModel(
         get() = when (_uiState.value.selectedProvider) {
             ProviderChoice.BACKEND -> backendProvider
             ProviderChoice.MOCK -> mockProvider
+            ProviderChoice.LOCAL -> localProvider ?: mockProvider
             ProviderChoice.DEBUG_SCRIPTED -> debugProvider
         }
 
